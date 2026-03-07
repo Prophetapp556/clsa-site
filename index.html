@@ -1153,7 +1153,11 @@ When a resource isn't in the directory, redirect to 211 or findhelp.org. Never g
     wrap.appendChild(label);
     wrap.appendChild(bubble);
     chatHistory.appendChild(wrap);
-    chatHistory.scrollTop = chatHistory.scrollHeight;
+    if (role === 'ai') {
+      wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
   }
 
   function showTyping() {
