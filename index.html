@@ -310,6 +310,8 @@
       touch-action: manipulation;
     }
     .chat-input::placeholder { color: rgba(136,136,128,0.35); }
+    .chat-input:focus { outline: none; border: none; box-shadow: none; }
+    textarea { outline: none; }
 
     .input-footer { display: flex; align-items: center; justify-content: space-between; }
 
@@ -1070,9 +1072,7 @@ Be direct, warm, and honest. Give real answers. Don't hedge unnecessarily. Treat
 You serve the Charlotte, NC community and beyond.`;
 
   const GREETINGS = [
-    "Ready to work. What's on your mind?",
-    "You showed up. That's the first step. What do you need?",
-    "You came here for a reason. How can we help?"
+    "Hello, how can I help?"
   ];
 
   const messages = [];
@@ -1093,6 +1093,14 @@ You serve the Charlotte, NC community and beyond.`;
     }
   });
 
+  function renderMarkdown(text) {
+    return text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+  }
+
   function appendMessage(role, text) {
     const wrap = document.createElement('div');
     wrap.classList.add('msg', role);
@@ -1101,7 +1109,11 @@ You serve the Charlotte, NC community and beyond.`;
     label.textContent = role === 'ai' ? 'ProphetApp AI' : 'You';
     const bubble = document.createElement('div');
     bubble.classList.add('msg-bubble');
-    bubble.textContent = text;
+    if (role === 'ai') {
+      bubble.innerHTML = renderMarkdown(text);
+    } else {
+      bubble.textContent = text;
+    }
     wrap.appendChild(label);
     wrap.appendChild(bubble);
     chatHistory.appendChild(wrap);
