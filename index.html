@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carolina LifeStock Association</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --gold: #C9A84C;
+      --gold-light: #e2c070;
+      --gold-dim: rgba(201,168,76,0.12);
+      --gold-border: rgba(201,168,76,0.22);
+      --white: #f0ede8;
+      --gray: #888880;
+      --text-muted: rgba(240,237,232,0.55);
+    }
+
+    html, body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── HAMBURGER BUTTON ─── */
+    .menu-btn {
+      position: fixed;
+      top: 22px;
+      right: 24px;
+      z-index: 1000;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      transition: opacity 0.2s;
+    }
+    .menu-btn:hover { opacity: 0.7; }
+    .menu-btn span {
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: var(--gold);
+      transition: transform 0.3s, opacity 0.3s;
+      transform-origin: center;
+    }
+    .menu-btn.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .menu-btn.open span:nth-child(2) { opacity: 0; }
+    .menu-btn.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ─── NAV DRAWER ─── */
+    .nav-drawer {
+      position: fixed;
+      top: 0; right: 0;
+      width: 300px;
+      height: 100vh;
+      background: #0e0e0e;
+      border-left: 1px solid var(--gold-border);
+      z-index: 999;
+      transform: translateX(100%);
+      transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      padding: 80px 40px 40px;
+    }
+    .nav-drawer.open { transform: translateX(0); }
+
+    .nav-drawer-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(201,168,76,0.4);
+      margin-bottom: 32px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .nav-link {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 400;
+      color: rgba(240,237,232,0.7);
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(201,168,76,0.08);
+      transition: color 0.2s, padding-left 0.2s;
+      letter-spacing: 0.01em;
+    }
+    .nav-link:last-child { border-bottom: none; }
+    .nav-link:hover {
+      color: var(--gold);
+      padding-left: 8px;
+    }
+
+    .nav-drawer-footer {
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(136,136,128,0.3);
+      margin-top: auto;
+      padding-top: 24px;
+    }
+
+    /* ─── OVERLAY ─── */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 998;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.38s;
+    }
+    .drawer-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ─── PAGES ─── */
+    .page { display: none; min-height: 100vh; }
+    .page.active { display: block; }
+
+    /* ════════════════════════════════
+       HOME PAGE
+    ════════════════════════════════ */
+    #page-home {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px 80px;
+      position: relative;
+    }
+
+    #page-home::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .clsa-header {
+      text-align: center;
+      margin-bottom: 44px;
+      animation: fadeDown 0.7s ease both;
+    }
+
+    .clsa-greeting-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    .clsa-mark { width: 38px; height: 38px; flex-shrink: 0; }
+
+    .clsa-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 4.5vw, 3rem);
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.01em;
+      line-height: 1.1;
+    }
+
+    .clsa-motto {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(0.8rem, 1.6vw, 0.98rem);
+      font-style: italic;
+      color: rgba(201,168,76,0.65);
+      letter-spacing: 0.04em;
+    }
+
+    .chat-history {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-bottom: 20px;
+      max-height: 44vh;
+      overflow-y: auto;
+      padding: 0 2px;
+      animation: fadeUp 0.8s ease 0.1s both;
+    }
+    .chat-history:empty { display: none; }
+    .chat-history::-webkit-scrollbar { width: 3px; }
+    .chat-history::-webkit-scrollbar-thumb { background: var(--gold-border); border-radius: 2px; }
+
+    .msg { display: flex; flex-direction: column; gap: 5px; animation: msgIn 0.3s ease both; }
+    .msg.ai   { align-items: flex-start; }
+    .msg.user { align-items: flex-end; }
+
+    .msg-label {
+      font-size: 0.58rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0 3px;
+    }
+    .msg.ai   .msg-label { color: var(--gold); }
+    .msg.user .msg-label { color: var(--gray); }
+
+    .msg-bubble {
+      max-width: 86%;
+      padding: 11px 16px;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      border-radius: 3px;
+    }
+    .msg.ai .msg-bubble {
+      background: var(--gold-dim);
+      border-left: 2px solid var(--gold);
+      border-radius: 0 3px 3px 0;
+      color: var(--white);
+      padding-left: 14px;
+    }
+    .msg.user .msg-bubble {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: rgba(240,237,232,0.88);
+    }
+
+    .typing-wrap { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
+    .typing-dots {
+      display: flex; gap: 5px; padding: 11px 14px;
+      background: var(--gold-dim);
+      border-left: 2px solid var(--gold);
+      border-radius: 0 3px 3px 0;
+    }
+    .typing-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--gold); opacity: 0.5;
+      animation: bounce 1.2s ease-in-out infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    .input-wrapper { width: 100%; max-width: 680px; animation: fadeUp 0.8s ease both; position: relative; z-index: 20; }
+
+    .input-box {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,168,76,0.28);
+      border-radius: 14px;
+      padding: 20px 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+      z-index: 5;
+      touch-action: manipulation;
+    }
+    .input-box:focus-within {
+      border-color: rgba(201,168,76,0.55);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.07);
+    }
+
+    .box-greeting {
+      font-family: 'Raleway', sans-serif;
+      font-size: 1rem;
+      font-weight: 400;
+      color: rgba(240,237,232,0.75);
+      line-height: 1.5;
+      pointer-events: none !important;
+      user-select: none;
+      margin-bottom: 2px;
+      position: relative;
+      z-index: 1;
+    }
+    .box-greeting.hidden { display: none; }
+
+    .chat-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      line-height: 1.6;
+      resize: none;
+      min-height: 28px;
+      max-height: 140px;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+      pointer-events: all;
+      -webkit-user-select: text;
+      user-select: text;
+      touch-action: manipulation;
+    }
+    .chat-input::placeholder { color: rgba(136,136,128,0.35); }
+
+    .input-footer { display: flex; align-items: center; justify-content: space-between; }
+
+    .input-meta {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(201,168,76,0.5);
+    }
+    .meta-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--gold); opacity: 0.55;
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+
+    .send-btn {
+      background: var(--gold); border: none; border-radius: 9px;
+      width: 38px; height: 38px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.15s; flex-shrink: 0;
+    }
+    .send-btn:hover { background: var(--gold-light); transform: scale(1.05); }
+    .send-btn:active { transform: scale(0.96); }
+    .send-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+    .send-btn svg { width: 16px; height: 16px; fill: #0a0a0a; }
+
+
+
+    /* ════════════════════════════════
+       INNER PAGES
+    ════════════════════════════════ */
+    .inner-page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 80px 40px 120px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      color: rgba(201,168,76,0.6);
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 56px;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--gold); }
+    .back-btn svg { width: 14px; height: 14px; }
+
+    .page-eyebrow {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      opacity: 0.8;
+    }
+
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+
+    .page-subtitle {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: rgba(201,168,76,0.65);
+      margin-bottom: 48px;
+      line-height: 1.5;
+    }
+
+    .page-divider {
+      width: 48px;
+      height: 1px;
+      background: var(--gold-border);
+      margin-bottom: 48px;
+    }
+
+    .page-body p {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: rgba(240,237,232,0.82);
+      margin-bottom: 24px;
+      font-weight: 400;
+    }
+
+    .page-body p:last-child { margin-bottom: 0; }
+
+    .page-body strong {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    /* Pillar blocks */
+    .pillars {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 40px 0;
+    }
+    @media (max-width: 600px) { .pillars { grid-template-columns: 1fr; } }
+
+    .pillar-card {
+      background: rgba(201,168,76,0.05);
+      border: 1px solid var(--gold-border);
+      border-radius: 4px;
+      padding: 24px;
+    }
+    .pillar-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .pillar-card p {
+      font-size: 0.88rem !important;
+      line-height: 1.7 !important;
+      color: rgba(240,237,232,0.7) !important;
+      margin-bottom: 0 !important;
+    }
+
+    /* Stat blocks */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin: 40px 0;
+      text-align: center;
+    }
+    @media (max-width: 560px) { .stats-row { grid-template-columns: 1fr; } }
+
+    .stat-block {
+      padding: 28px 16px;
+      border: 1px solid var(--gold-border);
+      border-radius: 4px;
+    }
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 700;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* Section headers within pages */
+    .section-head {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--white);
+      margin: 52px 0 20px;
+    }
+
+    /* Bill table */
+    .bill-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0 40px;
+      font-size: 0.85rem;
+    }
+    .bill-table th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border-bottom: 1px solid var(--gold-border);
+      font-weight: 600;
+    }
+    .bill-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: rgba(240,237,232,0.78);
+      line-height: 1.55;
+      vertical-align: top;
+    }
+    .bill-table tr:last-child td { border-bottom: none; }
+
+    /* Download link */
+    .doc-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 32px 0;
+    }
+    .doc-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--gold-border);
+      border-radius: 4px;
+      padding: 12px 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .doc-link:hover {
+      background: var(--gold-dim);
+      border-color: rgba(201,168,76,0.5);
+    }
+
+    /* Contact form area */
+    .contact-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .contact-field {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--gold-border);
+      border-radius: 6px;
+      padding: 14px 18px;
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .contact-field:focus { border-color: rgba(201,168,76,0.55); }
+    .contact-field::placeholder { color: rgba(136,136,128,0.5); }
+    textarea.contact-field { min-height: 120px; resize: vertical; }
+    .contact-submit {
+      background: var(--gold);
+      border: none;
+      border-radius: 6px;
+      padding: 14px 32px;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #0a0a0a;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      align-self: flex-start;
+    }
+    .contact-submit:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    /* Funding bar */
+    .funding-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .funding-row:last-child { border-bottom: none; }
+    .funding-source { font-size: 0.88rem; color: rgba(240,237,232,0.75); }
+    .funding-amount { font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--gold); font-weight: 600; }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 0.2; }
+    }
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .inner-page { animation: pageIn 0.4s ease both; }
+
+    @media (max-width: 600px) {
+      .clsa-name { font-size: 1.45rem; }
+      .clsa-mark { width: 26px; height: 26px; }
+      .chat-history { max-height: 36vh; }
+      #page-home { padding: 36px 16px 80px; }
+      .inner-page { padding: 64px 20px 100px; }
+      .page-title { font-size: 1.8rem; }
+      .stats-row { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .stats-row .stat-block:last-child:nth-child(odd) { grid-column: span 2; }
+      .pillars { grid-template-columns: 1fr; gap: 14px; }
+      .bill-table { font-size: 0.78rem; }
+      .bill-table th, .bill-table td { padding: 10px 10px; }
+      .nav-drawer { width: 260px; }
+      .nav-link { font-size: 1.1rem; }
+      .doc-links { flex-direction: column; }
+      .back-btn { margin-bottom: 36px; }
+      .menu-btn { top: 18px; right: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HAMBURGER ─── -->
+<button class="menu-btn" id="menuBtn" aria-label="Menu">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- ─── OVERLAY ─── -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+
+<!-- ─── NAV DRAWER ─── -->
+<nav class="nav-drawer" id="navDrawer">
+  <div class="nav-drawer-title">Carolina LifeStock Association</div>
+  <div class="nav-links">
+    <button class="nav-link" onclick="navigate('home')">Home</button>
+    <button class="nav-link" onclick="navigate('about')">About CLSA</button>
+    <button class="nav-link" onclick="navigate('spark')">Operation Spark of Hope</button>
+    <button class="nav-link" onclick="navigate('zero')">Operation Zero</button>
+    <button class="nav-link" onclick="navigate('prophetapp')">ProphetApp AI</button>
+    <button class="nav-link" onclick="navigate('partners')">Partners & Funders</button>
+    <button class="nav-link" onclick="navigate('contact')">Contact</button>
+  </div>
+  <div class="nav-drawer-footer">Charlotte, NC · carolinalsa.com</div>
+</nav>
+
+<!-- ════════════ HOME PAGE ════════════ -->
+<div class="page active" id="page-home">
+  <section style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px 80px;position:relative;">
+
+
+
+    <header class="clsa-header">
+      <div class="clsa-greeting-line">
+        <svg class="clsa-mark" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="19" y1="2"  x2="19" y2="36" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="2"  y1="19" x2="36" y2="19" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="6.5" y1="6.5"  x2="31.5" y2="31.5" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="31.5" y1="6.5" x2="6.5"  y2="31.5" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span class="clsa-name">Carolina LifeStock Association</span>
+      </div>
+      <div class="clsa-motto">Investing in the stock that matters most — people.</div>
+    </header>
+
+    <div class="chat-history" id="chatHistory"></div>
+
+    <div class="input-wrapper">
+      <div class="input-box">
+        <div class="box-greeting" id="boxGreeting"></div>
+        <textarea class="chat-input" id="chatInput" placeholder="" rows="1"></textarea>
+        <div class="input-footer">
+          <div class="input-meta">
+            <div class="meta-dot"></div>
+            ProphetApp AI
+          </div>
+          <button class="send-btn" id="sendBtn" title="Send">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<!-- ════════════ ABOUT ════════════ -->
+<div class="page" id="page-about">
+  <div class="inner-page">
+    <button class="back-btn" onclick="navigate('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+    <div class="page-eyebrow">Who We Are</div>
+    <h1 class="page-title">Carolina LifeStock Association</h1>
+    <p class="page-subtitle">A Charlotte-based nonprofit built on the belief that investing in people is the highest-return investment there is.</p>
+    <div class="page-divider"></div>
+    <div class="page-body">
+      <p>Carolina LifeStock Association (CLSA) is a Charlotte-based 501(c)(3) nonprofit founded in 2026 by a <strong>Purple Heart veteran</strong> and a team of career-driven community leaders. We exist to provide a holistic approach to community development — with education as the focal point.</p>
+      <p>What begins in Charlotte is designed to grow into something national. Every program we build, every system we put in place, every outcome we track is designed from the start to be replicable — because the problems we're solving aren't unique to one city.</p>
+      <p>Our work is rooted in four core values: <strong>love, compassion, humility, and selfless service</strong>. These aren't marketing language. They are the operating principles that determine how we work, who we hire, and how we measure success.</p>
+      <p>We are organized exclusively for charitable and educational purposes. Overhead is structurally capped at 8%. Every dollar flows directly to programs and people.</p>
+
+      <h2 class="section-head">Our Mission</h2>
+      <p>To empower communities through education, mentorship, and compassionate service — addressing root causes, not just symptoms, and building the infrastructure that makes lasting change possible.</p>
+
+      <h2 class="section-head">Founded by a Veteran</h2>
+      <p>CLSA was founded by a Purple Heart veteran who brought to this work the same principles that define military service at its best: mission clarity, accountability, operational discipline, and an unshakable commitment to the people beside you. Those principles run through everything we build.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ SPARK OF HOPE ════════════ -->
+<div class="page" id="page-spark">
+  <div class="inner-page">
+    <button class="back-btn" onclick="navigate('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+    <div class="page-eyebrow">The Delivery Model</div>
+    <h1 class="page-title">Operation Spark of Hope</h1>
+    <p class="page-subtitle">School-centered community development. Because the needs of a school almost always mirror the needs of the community around it.</p>
+    <div class="page-divider"></div>
+    <div class="page-body">
+      <p>Operation Spark of Hope is CLSA's community-level answer to one of the most important questions in large-scale social change: <strong>how do you ensure that investment actually transforms lives at the neighborhood level</strong>, rather than being absorbed by large contractors and institutional bureaucracies?</p>
+      <p>The model is simple and powerful: treat each school as the anchor institution for its surrounding neighborhood, and invest in teachers, students, families, and the broader community simultaneously. Address one without the other and you produce temporary relief, not lasting change.</p>
+      <p>The Year 1 pilot launches at a single Charlotte-Mecklenburg Title I school serving 400–600 students. Operations begin the moment $200,000 is confirmed.</p>
+    </div>
+
+    <div class="pillars">
+      <div class="pillar-card">
+        <h3>School Support</h3>
+        <p>Classroom resources, wellness programs, emergency financial assistance, and professional development for teachers. After-school clubs, tutors, mentors, arts programming, field trips, and a food and clothing pantry for students.</p>
+      </div>
+      <div class="pillar-card">
+        <h3>Community Partnerships</h3>
+        <p>A managed network of nonprofit, corporate, faith-based, and neighborhood partners coordinated around the specific needs of the school and its community.</p>
+      </div>
+      <div class="pillar-card">
+        <h3>Community Development</h3>
+        <p>Long-term neighborhood investment in housing, economic opportunity, public safety, and healthcare — the root conditions that determine whether children are safe before they ever walk through a school door.</p>
+      </div>
+      <div class="pillar-card">
+        <h3>Implementation & Accountability</h3>
+        <p>A professional program team, rigorous outcome tracking, quarterly Board reporting, and Standard Operating Procedures designed from the beginning to make this model replicable at scale.</p>
+      </div>
+    </div>
+
+    <h2 class="section-head">Financial Overview</h2>
+    <div class="page-body">
+      <p>The full Year 1 Spark of Hope pilot budget is <strong>$750,000</strong>, covering five core staff positions, student programming, teacher support, community partnership development, and operations. Overhead is structurally capped at 8%.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-block">
+        <span class="stat-number">$200K</span>
+        <span class="stat-label">Triggers Day 1 operations</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-number">$750K</span>
+        <span class="stat-label">Full Year 1 pilot budget</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-number">8%</span>
+        <span class="stat-label">Hard cap on overhead</span>
+      </div>
+    </div>
+
+    <h2 class="section-head">Funding Targets</h2>
+    <div class="funding-row"><span class="funding-source">Local corporate anchors (Bank of America, Atrium Health, Duke Energy)</span><span class="funding-amount">$250K–$300K</span></div>
+    <div class="funding-row"><span class="funding-source">City and county government grants</span><span class="funding-amount">$150K–$200K</span></div>
+    <div class="funding-row"><span class="funding-source">Local foundations including Foundation For The Carolinas</span><span class="funding-amount">$100K–$150K</span></div>
+    <div class="funding-row"><span class="funding-source">Individual major donors</span><span class="funding-amount">$50K–$100K</span></div>
+    <div class="funding-row"><span class="funding-source">National grants (21st Century Community Learning Centers)</span><span class="funding-amount">$50K–$100K</span></div>
+  </div>
+</div>
+
+<!-- ════════════ OPERATION ZERO ════════════ -->
+<div class="page" id="page-zero">
+  <div class="inner-page">
+    <button class="back-btn" onclick="navigate('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+    <div class="page-eyebrow">The 15-Year Vision</div>
+    <h1 class="page-title">Operation Zero</h1>
+    <p class="page-subtitle">A prevention-first initiative to end child abuse and trafficking — not by prosecuting harm after it occurs, but by eliminating the conditions that cause it.</p>
+    <div class="page-divider"></div>
+    <div class="page-body">
+      <p>Operation Zero is built on a foundational insight supported by decades of research: <strong>child abuse is largely preventable</strong>, and the most cost-effective intervention is the one that happens before a child is ever harmed.</p>
+      <p>The math is not complicated. What has been missing is the courage to follow the evidence.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-block">
+        <span class="stat-number">$500K+</span>
+        <span class="stat-label">Cost per prosecution</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-number">$1–2M</span>
+        <span class="stat-label">Lifetime survivor care cost</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-number">$5–15K</span>
+        <span class="stat-label">Shame-free prevention intervention</span>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <p>Operation Zero operates across <strong>seven pillars</strong>: shame-free mental health intervention, research, community-level delivery, survivor care, specialized law enforcement, economic development, and policy advocacy.</p>
+      <p>Operation Spark of Hope is the community-level delivery pillar — the ground game. The Modeling Industry Child Protection Act of 2026 is the policy pillar — the systemic change that creates the federal infrastructure to match what CLSA is doing on the ground.</p>
+    </div>
+
+    <!-- MICPA Section -->
+    <h2 class="section-head">Modeling Industry Child Protection Act of 2026</h2>
+    <div class="page-body">
+      <p>Today — right now — there is <strong>no federal agency with jurisdiction over modeling agencies</strong>. No registry. No background checks. No chaperone requirements. No financial monitoring. The exact same regulatory vacuum that Jeffrey Epstein exploited for over 15 years is still open.</p>
+      <p>The MICPA is a 15-section legislative framework that closes every documented gap. It is evidence-based, bipartisan by design, and built to be politically difficult to oppose. Every provision traces to a specific, documented failure in the Epstein and Maxwell cases.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-block">
+        <span class="stat-number">0</span>
+        <span class="stat-label">Federal agencies with modeling jurisdiction (today)</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-number">$1.5B</span>
+        <span class="stat-label">Annual authorization</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-number">95%</span>
+        <span class="stat-label">Direct to communities</span>
+      </div>
+    </div>
+
+    <table class="bill-table">
+      <thead>
+        <tr><th>Section</th><th>What It Does</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Federal Registry (Sec. 3)</strong></td><td>First-ever federal registration of modeling agencies. Background checks, $1M surety bonds, public database. Life imprisonment for willful violations involving minors.</td></tr>
+        <tr><td><strong>Minor Protections (Sec. 4)</strong></td><td>Independent chaperones at all times. Coogan's Law expansion: 80% of earnings in blocked trusts. Work hour limits. Digital content consent and takedown rights.</td></tr>
+        <tr><td><strong>International (Sec. 5)</strong></td><td>New Modeling Visa Certification. Private interviews for minors at ports of entry. INTERPOL coordination.</td></tr>
+        <tr><td><strong>Financial (Sec. 6)</strong></td><td>Tiered SAR thresholds. Crypto monitoring. Dedicated FinCEN review team. $1M–$5M penalties for non-compliant banks.</td></tr>
+        <tr><td><strong>Whistleblowers (Sec. 7)</strong></td><td>Immigration firewall — models can report without fear of deportation. Rewards of 10–30% of recoveries.</td></tr>
+        <tr><td><strong>Victim Services (Sec. 8)</strong></td><td>24/7 crisis response. 10-year statute of limitations. Male victim provisions. Victim Compensation Fund.</td></tr>
+        <tr><td><strong>Enforcement (Sec. 9)</strong></td><td>8-agency Task Force. Dedicated FBI unit (50 agents). National database linked to NCIC, INTERPOL, CyberTipline.</td></tr>
+        <tr><td><strong>Funding (Sec. 10)</strong></td><td>$1.5B/year. 95% direct to communities. Five proven national partners. Independent oversight with clawback authority.</td></tr>
+        <tr><td><strong>Digital Platforms (Sec. 11)</strong></td><td>Platforms must verify agency registration. Algorithmic protections for minors under 16. FTC enforcement up to $50M/quarter.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="page-body">
+      <p><strong>Five named national partners:</strong> National Center for Missing & Exploited Children, Tim Tebow Foundation, Thorn, Polaris Project, and International Justice Mission — each with congressional testimony records and non-overlapping missions.</p>
+      <p><strong>Recommended sponsors:</strong> Senate — Durbin (D-IL) and Graham (R-SC) as bipartisan leads. House — Bean (R-FL) with Courtney (D-CT).</p>
+    </div>
+
+    <div class="doc-links">
+      <a class="doc-link" href="#" onclick="return false;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Legislative Briefing (PDF)
+      </a>
+      <a class="doc-link" href="#" onclick="return false;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Full Bill Text (PDF)
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ PROPHETAPP ════════════ -->
+<div class="page" id="page-prophetapp">
+  <div class="inner-page">
+    <button class="back-btn" onclick="navigate('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+    <div class="page-eyebrow">The Technology Infrastructure</div>
+    <h1 class="page-title">ProphetApp AI</h1>
+    <p class="page-subtitle">Connecting parents, teachers, and nonprofits through one intelligent platform. It doesn't hand families a map and wish them luck. It walks them there.</p>
+    <div class="page-divider"></div>
+    <div class="page-body">
+      <p>In most cities today, three groups of people are all trying to help the same children — but they operate in complete isolation from each other. Parents know their child's needs but don't know what resources exist. Teachers see struggling students daily but have no fast, reliable way to connect families to support. Nonprofits offer valuable services but can't efficiently reach the families who need them most.</p>
+      <p>ProphetApp AI closes the gap between knowing a resource exists and actually getting a family connected to it — through <strong>direct, real-time referrals</strong>. It doesn't provide information. It takes action.</p>
+    </div>
+
+    <div class="pillars">
+      <div class="pillar-card">
+        <h3>For Parents</h3>
+        <p>Ask questions in plain language, get hyper-local results by zip code. The platform submits a referral on their behalf — no phone calls, no websites to navigate, no forms to fill out separately.</p>
+      </div>
+      <div class="pillar-card">
+        <h3>For Teachers</h3>
+        <p>Find resources in under a minute. The Emergency Teacher Function enables a live referral submitted through the chatbot in under two minutes — directly to a nonprofit that can respond.</p>
+      </div>
+      <div class="pillar-card">
+        <h3>For Nonprofits</h3>
+        <p>Free permanently. Receive structured real-time referrals, manage availability, track families served, and generate impact data automatically — without additional administrative work.</p>
+      </div>
+      <div class="pillar-card">
+        <h3>Emergency Referral Categories</h3>
+        <p>Emergency food. Housing and shelter. Student safety. Mental health crisis. Medical, vision, or dental. Utility shutoff. Family crisis or domestic instability.</p>
+      </div>
+    </div>
+
+    <h2 class="section-head">The Build Sequence</h2>
+    <div class="page-body">
+      <p><strong>Phase 1 — Chatbot with Referral Function</strong> (live now): AI-powered chatbot using the Claude API with basic resource matching and a working referral submission workflow. Cost: $20–$50/month.</p>
+      <p><strong>Phase 2 — Full Platform</strong>: Complete application with user accounts, nonprofit dashboards, full referral engine with escalation logic, impact tracking, multilingual support, and real-time availability management. Cost: $5,000–$25,000. Timeline: 3–6 months.</p>
+      <p><strong>Phase 3 — City Expansion</strong>: With a working product and measurable impact data, expand to a full city ecosystem of partner organizations. The demonstrated referral outcomes make CLSA highly competitive for education, family services, and technology equity grants.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ PARTNERS ════════════ -->
+<div class="page" id="page-partners">
+  <div class="inner-page">
+    <button class="back-btn" onclick="navigate('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+    <div class="page-eyebrow">The Network</div>
+    <h1 class="page-title">Partners & Funders</h1>
+    <p class="page-subtitle">CLSA is seeking founding partners who understand that what begins in one Charlotte school is the foundation of something far larger.</p>
+    <div class="page-divider"></div>
+    <div class="page-body">
+      <p>A <strong>$200,000 commitment</strong> starts operations on Day 1. A $750,000 commitment fully funds the Year 1 pilot and produces the evidence that unlocks everything that follows — the outcomes data, the operational SOPs, the community trust, and the partner relationships that make replication possible.</p>
+      <p>Every teacher who stays because she finally felt supported. Every student who finds their place in a boxing club or a robotics competition. Every family that finds the resource they needed. Every one of those moments is the proof — and the proof is what changes everything.</p>
+    </div>
+
+    <h2 class="section-head">Funding Partnerships We're Building</h2>
+    <div class="funding-row"><span class="funding-source">Local corporate anchors — Bank of America, Atrium Health, Duke Energy</span></div>
+    <div class="funding-row"><span class="funding-source">City and county government grants</span></div>
+    <div class="funding-row"><span class="funding-source">Local foundations — Foundation For The Carolinas and others</span></div>
+    <div class="funding-row"><span class="funding-source">Individual major donors</span></div>
+    <div class="funding-row"><span class="funding-source">National grants — 21st Century Community Learning Centers</span></div>
+
+    <h2 class="section-head">Nonprofit Partners</h2>
+    <div class="page-body">
+      <p>ProphetApp AI is offered <strong>free permanently</strong> to all participating nonprofit organizations. If your organization serves families in the Charlotte area and you want to be part of the referral network, we want to hear from you.</p>
+    </div>
+
+    <button class="contact-submit" onclick="navigate('contact')" style="margin-top:8px;">Get Involved</button>
+  </div>
+</div>
+
+<!-- ════════════ CONTACT ════════════ -->
+<div class="page" id="page-contact">
+  <div class="inner-page">
+    <button class="back-btn" onclick="navigate('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+    <div class="page-eyebrow">Get Involved</div>
+    <h1 class="page-title">Contact</h1>
+    <p class="page-subtitle">Whether you're a funder, a nonprofit, a school, or someone who wants to help — reach out. We respond to every message.</p>
+    <div class="page-divider"></div>
+    <div class="page-body">
+      <p>Carolina LifeStock Association · Charlotte, NC · <strong>carolinalsa.com</strong></p>
+    </div>
+    <div class="contact-fields">
+      <input type="text" class="contact-field" placeholder="Your name" />
+      <input type="email" class="contact-field" placeholder="Email address" />
+      <select class="contact-field" style="cursor:pointer;">
+        <option value="" disabled selected>I'm reaching out as...</option>
+        <option>A potential funder or donor</option>
+        <option>A nonprofit partner</option>
+        <option>A school or district representative</option>
+        <option>A community member</option>
+        <option>Media or press</option>
+        <option>Other</option>
+      </select>
+      <textarea class="contact-field" placeholder="Your message"></textarea>
+      <button class="contact-submit">Send Message</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ─── NAVIGATION ─── */
+  const pages = {
+    home: 'page-home',
+    about: 'page-about',
+    spark: 'page-spark',
+    zero: 'page-zero',
+    prophetapp: 'page-prophetapp',
+    partners: 'page-partners',
+    contact: 'page-contact'
+  };
+
+  function navigate(key) {
+    // Hide all pages
+    Object.values(pages).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+    });
+    // Show target
+    const target = document.getElementById(pages[key]);
+    if (target) {
+      target.style.display = 'block';
+      target.classList.add('active');
+      window.scrollTo(0, 0);
+    }
+    closeMenu();
+  }
+
+  // Init: show home, hide rest
+  Object.entries(pages).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    if (el && key !== 'home') el.style.display = 'none';
+  });
+
+  /* ─── MENU ─── */
+  const menuBtn = document.getElementById('menuBtn');
+  const navDrawer = document.getElementById('navDrawer');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+
+  function openMenu() {
+    menuBtn.classList.add('open');
+    navDrawer.classList.add('open');
+    drawerOverlay.classList.add('open');
+  }
+
+  function closeMenu() {
+    menuBtn.classList.remove('open');
+    navDrawer.classList.remove('open');
+    drawerOverlay.classList.remove('open');
+  }
+
+  menuBtn.addEventListener('click', () => {
+    navDrawer.classList.contains('open') ? closeMenu() : openMenu();
+  });
+
+  drawerOverlay.addEventListener('click', closeMenu);
+
+  /* ─── PROPHETAPP AI CHAT ─── */
+  
+
+  const SYSTEM_PROMPT = `You are ProphetApp AI, an AI assistant created by the Carolina LifeStock Association (CLSA) in Charlotte, NC. CLSA is a nonprofit founded by a Purple Heart veteran dedicated to empowering communities through education, mentorship, and compassionate service.
+
+Your role is to help parents, teachers, veterans, students, and community members find real resources, think critically, and navigate challenges. You connect people to action — not just information.
+
+Core values: love, compassion, humility, and service.
+
+Be direct, warm, and honest. Give real answers. Don't hedge unnecessarily. Treat every person with dignity and respect. If someone needs a resource, help them find it. If someone needs to think through a problem, help them think clearly.
+
+You serve the Charlotte, NC community and beyond.`;
+
+  const GREETINGS = [
+    "Ready to work. What's on your mind?",
+    "You showed up. That's the first step. What do you need?",
+    "You came here for a reason. How can we help?"
+  ];
+
+  const messages = [];
+  let isLoading = false;
+  let greetingDismissed = false;
+
+  const chatHistory = document.getElementById('chatHistory');
+  const chatInput   = document.getElementById('chatInput');
+  const sendBtn     = document.getElementById('sendBtn');
+  const boxGreeting = document.getElementById('boxGreeting');
+
+  boxGreeting.textContent = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+
+  chatInput.addEventListener('focus', () => {
+    if (!greetingDismissed) {
+      boxGreeting.classList.add('hidden');
+      greetingDismissed = true;
+    }
+  });
+
+  function appendMessage(role, text) {
+    const wrap = document.createElement('div');
+    wrap.classList.add('msg', role);
+    const label = document.createElement('div');
+    label.classList.add('msg-label');
+    label.textContent = role === 'ai' ? 'ProphetApp AI' : 'You';
+    const bubble = document.createElement('div');
+    bubble.classList.add('msg-bubble');
+    bubble.textContent = text;
+    wrap.appendChild(label);
+    wrap.appendChild(bubble);
+    chatHistory.appendChild(wrap);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+  }
+
+  function showTyping() {
+    const wrap = document.createElement('div');
+    wrap.classList.add('typing-wrap');
+    wrap.id = 'typingWrap';
+    const label = document.createElement('div');
+    label.classList.add('msg-label');
+    label.style.cssText = 'color:var(--gold);font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;font-weight:600;padding:0 3px;';
+    label.textContent = 'ProphetApp AI';
+    const dots = document.createElement('div');
+    dots.classList.add('typing-dots');
+    for (let i = 0; i < 3; i++) {
+      const d = document.createElement('div');
+      d.classList.add('typing-dot');
+      dots.appendChild(d);
+    }
+    wrap.appendChild(label);
+    wrap.appendChild(dots);
+    chatHistory.appendChild(wrap);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+  }
+
+  function hideTyping() {
+    const el = document.getElementById('typingWrap');
+    if (el) el.remove();
+  }
+
+  async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text || isLoading) return;
+    isLoading = true;
+    sendBtn.disabled = true;
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+    messages.push({ role: 'user', content: text });
+    appendMessage('user', text);
+    showTyping();
+
+    try {
+      const apiMessages = messages.map(m => ({
+        role: m.role === 'ai' ? 'assistant' : m.role,
+        content: m.content
+      }));
+      const res = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: SYSTEM_PROMPT,
+          messages: apiMessages
+        })
+      });
+      let data;
+      const rawText = await res.text();
+      try { data = JSON.parse(rawText); } catch(e) { data = {}; }
+      hideTyping();
+      const reply = data?.content?.[0]?.text 
+        || data?.error?.message 
+        || "Error " + res.status + ": " + rawText.substring(0, 120);
+      messages.push({ role: 'assistant', content: reply });
+      appendMessage('ai', reply);
+    } catch (err) {
+      hideTyping();
+      appendMessage('ai', "Something interrupted us. Please try again.");
+    }
+
+    isLoading = false;
+    sendBtn.disabled = false;
+    chatInput.focus();
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+  chatInput.addEventListener('input', () => {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
+  });
+</script>
+</body>
+</html>
