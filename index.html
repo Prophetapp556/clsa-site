@@ -2100,11 +2100,7 @@ function tsIsTrainer() {
 // Show Review button only for trainer account
 function tsCheckTrainerUI() {
   const wrap = document.getElementById('ts-review-btn-wrap');
-  // Temporarily show email in limit note so we can confirm what Supabase stored
-  const note = document.getElementById('ts-limit-note');
-  if (note && tsUser?.email) note.title = tsUser.email;
-  // Show button — unlock for debugging, will re-lock after confirming email
-  if (wrap) wrap.style.display = 'block';
+  if (wrap) wrap.style.display = tsIsTrainer() ? 'block' : 'none';
 }
 
 // ── OPEN REVIEW MODAL ──
