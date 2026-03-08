@@ -1656,7 +1656,7 @@
         <!-- Input -->
         <div class="ts-input-area">
           <div class="ts-input-wrap">
-            <textarea class="ts-input" id="ts-input" placeholder="Ask anything..." rows="1"></textarea>
+            <textarea class="ts-input" id="ts-input" placeholder="Ask anything..." rows="1" onkeydown="tsSendKey(event)" oninput="tsAutoResize(this)"></textarea>
             <button class="ts-send" id="ts-send-btn" onclick="tsSend()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
@@ -1988,12 +1988,12 @@ async function tsSend() {
 
   } catch (err) {
     document.getElementById('ts-typing')?.remove();
-    tsAppendMsg('ai', 'Something interrupted us. Please try again.');
+    tsAppendMsg('ai', 'Something went wrong. Please try again.');
+  } finally {
+    tsLoading = false;
+    document.getElementById('ts-send-btn').disabled = false;
+    input.focus();
   }
-
-  tsLoading = false;
-  document.getElementById('ts-send-btn').disabled = false;
-  input.focus();
 }
 
 // ─── KEY HANDLER ───
