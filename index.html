@@ -1693,36 +1693,28 @@ let tsPendingEmail = null;
 sb.auth.onAuthStateChange(async (event, session) => {
   if (session?.user) {
     tsUser = session.user;
-    // If confirmation link was clicked, make sure Teachers Space is visible
-    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-      const tsEl = document.getElementById('page-ts');
-      if (tsEl && tsEl.style.display === 'none') {
-        // Redirect landed on home page — auto-open Teachers Space
-        navigate('ts');
-      }
+    const tsEl = document.getElementById('page-ts');
+    const tsIsOpen = tsEl && tsEl.style.display !== 'none';
+    // Only auto-open TS if: confirmation redirect hash was in URL, OR TS is already open
+    if (tsIsOpen || window.__tsOpenOnAuth) {
+      window.__tsOpenOnAuth = false;
+      if (!tsIsOpen) navigate('ts');
+      await tsLoadDashboard();
     }
-    await tsLoadDashboard();
   } else {
     tsUser = null;
-    // Only show auth if Teachers Space is currently open
     const tsEl = document.getElementById('page-ts');
     if (tsEl && tsEl.style.display !== 'none') tsShowAuth();
   }
 });
 
 // ─── HANDLE CONFIRMATION REDIRECT ───
-// If page loads with #access_token in URL (email confirmation link clicked), open Teachers Space
+// If page loads with #access_token in URL (email confirmation link clicked), flag to open TS
 (function() {
   const hash = window.location.hash;
   if (hash && hash.includes('access_token')) {
-    // Supabase JS will auto-detect and process the token via onAuthStateChange
-    // We just need to make sure Teachers Space is open to receive it
-    window.addEventListener('DOMContentLoaded', function() {
-      const tsEl = document.getElementById('page-ts');
-      if (tsEl) { tsEl.style.display = 'flex'; }
-      // Clean the URL hash
-      history.replaceState(null, '', window.location.pathname);
-    });
+    window.__tsOpenOnAuth = true;
+    history.replaceState(null, '', window.location.pathname);
   }
 })();
 
