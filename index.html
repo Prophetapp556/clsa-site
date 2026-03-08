@@ -1956,7 +1956,7 @@ function tsOpenChat(chat) {
   tsRenderMessages();
   tsRenderChatList();
   if (tsMessages.length === 0) {
-    tsAppendMsg('ai', 'Welcome — glad you're here. I'm built to support everyone in the school building: planning, strategy, student needs, the hard conversations, the daily weight of the work. What's on your mind?');
+    tsAppendMsg("ai", "Welcome — glad you're here. I'm built to support everyone in the school building: planning, strategy, student needs, the hard conversations, the daily weight of the work. What's on your mind?");
   }
 }
 
@@ -1993,11 +1993,8 @@ function tsAppendMsg(role, content, scroll = true) {
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/^— (.+)$/gm, '<p>— $1</p>')
       .replace(/^(\d+\)|\d+\.) (.+)$/gm, '<p>$1 $2</p>')
-      .replace(/
-
-/g, '</p><p>')
-      .replace(/
-/g, '<br>');
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>');
     div.innerHTML = '<p>' + html + '</p>';
 
     // Add Word doc button for substantial responses
@@ -2075,8 +2072,7 @@ async function tsCreateDoc(content) {
   try {
     const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docx;
 
-    const lines = content.split('
-').filter(l => l.trim());
+    const lines = content.split('\n').filter(l => l.trim());
     const children = [];
 
     children.push(new Paragraph({
@@ -2100,8 +2096,7 @@ async function tsCreateDoc(content) {
         }));
       } else if (line.startsWith('— ') || line.startsWith('- ')) {
         children.push(new Paragraph({
-          children: [new TextRun({ text: clean.replace(/^[—\-]\s/, ''), font: 'Arial', size: 22 })],
-          bullet: { level: 0 },
+          children: [new TextRun({ text: '• ' + clean.replace(/^[—\-]\s/, ''), font: 'Arial', size: 22 })],
           spacing: { after: 80 }
         }));
       } else {
