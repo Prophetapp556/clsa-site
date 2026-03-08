@@ -639,6 +639,103 @@
       .back-btn { margin-bottom: 36px; }
       .menu-btn { top: 18px; right: 18px; }
     }
+
+    /* ─── TEACHERS SPACE ─── */
+    #page-teachers { min-height: 100vh; }
+    .teachers-wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+
+    /* Auth screens */
+    .auth-box {
+      max-width: 460px; margin: 60px auto 0;
+      background: rgba(201,168,76,0.05);
+      border: 1px solid var(--gold-border);
+      border-radius: 12px; padding: 40px 36px;
+    }
+    .auth-logo { font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--gold); margin-bottom:6px; }
+    .auth-sub { color:var(--text-muted); font-size:0.88rem; margin-bottom:28px; line-height:1.5; }
+    .auth-tabs { display:flex; gap:0; margin-bottom:28px; border:1px solid var(--gold-border); border-radius:8px; overflow:hidden; }
+    .auth-tab { flex:1; padding:10px; background:transparent; color:var(--text-muted); border:none; cursor:pointer; font-family:'Raleway',sans-serif; font-size:0.9rem; transition:all 0.2s; }
+    .auth-tab.active { background:var(--gold); color:#000; font-weight:600; }
+    .auth-input {
+      width:100%; padding:12px 14px; margin-bottom:14px;
+      background:rgba(255,255,255,0.05); border:1px solid var(--gold-border);
+      border-radius:8px; color:var(--white); font-family:'Raleway',sans-serif; font-size:0.95rem;
+    }
+    .auth-input:focus { outline:none; border-color:var(--gold); }
+    .auth-input::placeholder { color:var(--text-muted); }
+    .auth-btn {
+      width:100%; padding:13px; background:var(--gold); color:#000;
+      border:none; border-radius:8px; font-family:'Raleway',sans-serif;
+      font-size:1rem; font-weight:700; cursor:pointer; margin-top:6px; transition:opacity 0.2s;
+    }
+    .auth-btn:hover { opacity:0.85; }
+    .auth-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .auth-msg { font-size:0.85rem; margin-top:14px; text-align:center; min-height:20px; }
+    .auth-msg.error { color:#e57373; }
+    .auth-msg.success { color:#81c784; }
+    .auth-note { font-size:0.78rem; color:var(--text-muted); margin-top:16px; text-align:center; line-height:1.5; }
+
+    /* Dashboard */
+    .ts-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; padding-bottom:20px; border-bottom:1px solid var(--gold-border); flex-wrap:wrap; gap:12px; }
+    .ts-header-left { }
+    .ts-welcome { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--gold); }
+    .ts-sub { color:var(--text-muted); font-size:0.88rem; margin-top:4px; }
+    .ts-signout { padding:8px 18px; background:transparent; border:1px solid var(--gold-border); color:var(--text-muted); border-radius:6px; cursor:pointer; font-size:0.85rem; font-family:'Raleway',sans-serif; transition:all 0.2s; }
+    .ts-signout:hover { border-color:var(--gold); color:var(--white); }
+
+    /* Chat layout */
+    .ts-layout { display:grid; grid-template-columns:240px 1fr; gap:24px; height:calc(100vh - 220px); min-height:500px; }
+    @media(max-width:700px){ .ts-layout { grid-template-columns:1fr; height:auto; } }
+
+    /* Sidebar */
+    .ts-sidebar { display:flex; flex-direction:column; gap:10px; }
+    .ts-new-btn { padding:12px; background:var(--gold); color:#000; border:none; border-radius:8px; font-family:'Raleway',sans-serif; font-weight:700; font-size:0.95rem; cursor:pointer; transition:opacity 0.2s; }
+    .ts-new-btn:hover { opacity:0.85; }
+    .ts-chats-label { font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-top:8px; padding:0 4px; }
+    .ts-chat-item { padding:10px 12px; background:rgba(201,168,76,0.05); border:1px solid var(--gold-border); border-radius:8px; cursor:pointer; transition:all 0.2s; position:relative; }
+    .ts-chat-item:hover, .ts-chat-item.active { background:rgba(201,168,76,0.12); border-color:var(--gold); }
+    .ts-chat-title { font-size:0.88rem; color:var(--white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
+    .ts-chat-date { font-size:0.72rem; color:var(--text-muted); margin-top:3px; }
+    .ts-chat-del { position:absolute; top:8px; right:8px; background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem; opacity:0; transition:opacity 0.2s; padding:2px 6px; }
+    .ts-chat-item:hover .ts-chat-del { opacity:1; }
+    .ts-chat-del:hover { color:#e57373; }
+    .ts-limit-note { font-size:0.75rem; color:var(--text-muted); text-align:center; padding:8px 4px; }
+
+    /* Chat panel */
+    .ts-chat-panel { display:flex; flex-direction:column; background:rgba(201,168,76,0.03); border:1px solid var(--gold-border); border-radius:12px; overflow:hidden; }
+    .ts-chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:14px; }
+    .ts-chat-messages::-webkit-scrollbar { width:4px; }
+    .ts-chat-messages::-webkit-scrollbar-thumb { background:var(--gold-border); border-radius:2px; }
+
+    /* Messages */
+    .ts-msg { max-width:85%; line-height:1.65; font-size:0.92rem; }
+    .ts-msg.user { align-self:flex-end; background:var(--gold); color:#000; padding:10px 14px; border-radius:12px 12px 2px 12px; font-weight:500; }
+    .ts-msg.ai { align-self:flex-start; background:rgba(255,255,255,0.06); color:var(--white); padding:12px 16px; border-radius:2px 12px 12px 12px; }
+    .ts-msg.ai strong { color:var(--gold); }
+    .ts-msg.ai p { margin-bottom:8px; }
+    .ts-msg.ai p:last-child { margin-bottom:0; }
+    .ts-typing { align-self:flex-start; padding:12px 16px; background:rgba(255,255,255,0.06); border-radius:2px 12px 12px 12px; color:var(--text-muted); font-size:0.88rem; }
+
+    /* Word doc button */
+    .ts-doc-btn { display:inline-flex; align-items:center; gap:8px; margin-top:10px; padding:8px 16px; background:transparent; border:1px solid var(--gold); color:var(--gold); border-radius:6px; font-size:0.82rem; cursor:pointer; font-family:'Raleway',sans-serif; transition:all 0.2s; }
+    .ts-doc-btn:hover { background:var(--gold); color:#000; }
+
+    /* Input bar */
+    .ts-input-bar { padding:14px 16px; border-top:1px solid var(--gold-border); display:flex; gap:10px; align-items:flex-end; background:rgba(0,0,0,0.3); }
+    .ts-input { flex:1; padding:10px 14px; background:rgba(255,255,255,0.05); border:1px solid var(--gold-border); border-radius:8px; color:var(--white); font-family:'Raleway',sans-serif; font-size:0.93rem; resize:none; min-height:42px; max-height:120px; line-height:1.5; }
+    .ts-input:focus { outline:none; border-color:var(--gold); }
+    .ts-input::placeholder { color:var(--text-muted); }
+    .ts-send { padding:10px 16px; background:var(--gold); color:#000; border:none; border-radius:8px; cursor:pointer; font-size:1rem; transition:opacity 0.2s; flex-shrink:0; }
+    .ts-send:hover { opacity:0.85; }
+    .ts-send:disabled { opacity:0.4; cursor:not-allowed; }
+
+    /* Verification screen */
+    .verify-box { max-width:460px; margin:80px auto 0; text-align:center; }
+    .verify-icon { font-size:3rem; margin-bottom:20px; }
+    .verify-title { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--gold); margin-bottom:12px; }
+    .verify-text { color:var(--text-muted); line-height:1.7; margin-bottom:24px; }
+    .verify-resend { background:none; border:1px solid var(--gold-border); color:var(--gold); padding:10px 24px; border-radius:8px; cursor:pointer; font-family:'Raleway',sans-serif; font-size:0.9rem; }
+
   </style>
 </head>
 <body>
@@ -662,6 +759,7 @@
     <button class="nav-link" onclick="navigate('prophetapp')">ProphetApp AI</button>
     <button class="nav-link" onclick="navigate('partners')">Partners & Funders</button>
     <button class="nav-link" onclick="navigate('contact')">Contact</button>
+    <button class="nav-link teachers-nav-btn" onclick="navigate('teachers')" style="color:var(--gold);border-top:1px solid var(--gold-border);margin-top:8px;font-weight:600;">Teachers Space</button>
   </div>
   <div class="nav-drawer-footer">Charlotte, NC · carolinalsa.com</div>
 </nav>
@@ -1010,7 +1108,8 @@
     zero: 'page-zero',
     prophetapp: 'page-prophetapp',
     partners: 'page-partners',
-    contact: 'page-contact'
+    contact: 'page-contact',
+    teachers: 'page-teachers'
   };
 
   function navigate(key) {
@@ -1608,5 +1707,446 @@ ORGANIZATIONS FOR SCHOOL SUPPLY / RESOURCE GAPS (use naturally, not as a dump):
     chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
   });
 </script>
+
+<!-- ════════════ TEACHERS SPACE ════════════ -->
+<div class="page" id="page-teachers">
+  <div class="teachers-wrap">
+    <button class="back-btn" onclick="navigate('home')" style="margin-bottom:20px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+
+    <!-- AUTH SCREEN -->
+    <div id="ts-auth">
+      <div class="auth-box">
+        <div class="auth-logo">ProphetApp AI</div>
+        <div class="auth-sub">Teachers Space — powered by CLSA.<br>Sign in with your school email to get started.</div>
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-signin" onclick="tsTab('signin')">Sign In</button>
+          <button class="auth-tab" id="tab-signup" onclick="tsTab('signup')">Create Account</button>
+        </div>
+        <div id="ts-signin-form">
+          <input class="auth-input" id="signin-email" type="email" placeholder="School email (e.g. name@cms.k12.nc.us)" />
+          <input class="auth-input" id="signin-pass" type="password" placeholder="Password" />
+          <button class="auth-btn" id="signin-btn" onclick="tsSignIn()">Sign In</button>
+          <div class="auth-msg" id="signin-msg"></div>
+        </div>
+        <div id="ts-signup-form" style="display:none;">
+          <input class="auth-input" id="signup-name" type="text" placeholder="Your name" />
+          <input class="auth-input" id="signup-email" type="email" placeholder="School email (e.g. name@cms.k12.nc.us)" />
+          <input class="auth-input" id="signup-pass" type="password" placeholder="Create password (min 8 characters)" />
+          <button class="auth-btn" id="signup-btn" onclick="tsSignUp()">Create Account</button>
+          <div class="auth-msg" id="signup-msg"></div>
+          <div class="auth-note">A confirmation link will be sent to your school email.<br>You must verify before signing in.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VERIFICATION PENDING -->
+    <div id="ts-verify" style="display:none;">
+      <div class="verify-box">
+        <div class="verify-icon">✉️</div>
+        <div class="verify-title">Check your school email</div>
+        <div class="verify-text">We sent a confirmation link to your school email address. Click the link to verify your account, then come back and sign in.</div>
+        <button class="verify-resend" onclick="tsResend()">Resend confirmation email</button>
+        <div class="auth-msg" id="verify-msg" style="margin-top:16px;"></div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="ts-dashboard" style="display:none;">
+      <div class="ts-header">
+        <div class="ts-header-left">
+          <div class="ts-welcome" id="ts-user-name">Welcome back</div>
+          <div class="ts-sub">ProphetApp AI · Teachers Space</div>
+        </div>
+        <button class="ts-signout" onclick="tsSignOut()">Sign Out</button>
+      </div>
+      <div class="ts-layout">
+        <!-- Sidebar -->
+        <div class="ts-sidebar">
+          <button class="ts-new-btn" onclick="tsNewChat()">+ New Chat</button>
+          <div class="ts-chats-label">Saved Chats</div>
+          <div id="ts-chat-list"></div>
+          <div class="ts-limit-note" id="ts-limit-note"></div>
+        </div>
+        <!-- Chat Panel -->
+        <div class="ts-chat-panel">
+          <div class="ts-chat-messages" id="ts-messages"></div>
+          <div class="ts-input-bar">
+            <textarea class="ts-input" id="ts-input" placeholder="Ask anything..." rows="1"></textarea>
+            <button class="ts-send" id="ts-send-btn" onclick="tsSend()">▶</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8/build/index.js"></script>
+<script>
+/* ═══════════════════════════════════════
+   TEACHERS SPACE — SUPABASE + CHAT
+═══════════════════════════════════════ */
+
+const SUPABASE_URL = 'https://yzvzcjfbgefwytvyhmjw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ofpejOZXspk1gy8xQRDA5A_5YSMo_X0';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const TS_SYSTEM_PROMPT = `You are ProphetApp AI — the most capable AI tool ever built for K-12 education, built by CLSA. You are in the Teachers Space — a verified environment for school staff. Be warm, direct, practical. Generate complete usable documents when asked. Reference NC SCOS standards with exact codes when building lesson plans.`;
+
+let tsUser = null;
+let tsChats = [];
+let tsActiveChat = null;
+let tsMessages = [];
+let tsLoading = false;
+let tsPendingEmail = null;
+
+// ─── AUTH STATE ───
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (session?.user) {
+    tsUser = session.user;
+    await tsLoadDashboard();
+  } else {
+    tsUser = null;
+    tsShowAuth();
+  }
+});
+
+// ─── TAB TOGGLE ───
+function tsTab(tab) {
+  document.getElementById('tab-signin').classList.toggle('active', tab === 'signin');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('ts-signin-form').style.display = tab === 'signin' ? 'block' : 'none';
+  document.getElementById('ts-signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+}
+
+// ─── SIGN UP ───
+async function tsSignUp() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-pass').value;
+  const msg = document.getElementById('signup-msg');
+
+  if (!name || !email || !pass) { tsMsg(msg, 'Please fill in all fields.', 'error'); return; }
+  if (pass.length < 8) { tsMsg(msg, 'Password must be at least 8 characters.', 'error'); return; }
+
+  const btn = document.getElementById('signup-btn');
+  btn.disabled = true; btn.textContent = 'Creating account...';
+
+  const { error } = await sb.auth.signUp({
+    email, password: pass,
+    options: { data: { full_name: name }, emailRedirectTo: window.location.href }
+  });
+
+  btn.disabled = false; btn.textContent = 'Create Account';
+  if (error) { tsMsg(msg, error.message, 'error'); return; }
+  tsPendingEmail = email;
+  tsShowVerify();
+}
+
+// ─── SIGN IN ───
+async function tsSignIn() {
+  const email = document.getElementById('signin-email').value.trim();
+  const pass = document.getElementById('signin-pass').value;
+  const msg = document.getElementById('signin-msg');
+
+  if (!email || !pass) { tsMsg(msg, 'Please enter your email and password.', 'error'); return; }
+
+  const btn = document.getElementById('signin-btn');
+  btn.disabled = true; btn.textContent = 'Signing in...';
+
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  btn.disabled = false; btn.textContent = 'Sign In';
+  if (error) { tsMsg(msg, error.message, 'error'); return; }
+}
+
+// ─── SIGN OUT ───
+async function tsSignOut() {
+  await sb.auth.signOut();
+  tsUser = null; tsChats = []; tsActiveChat = null; tsMessages = [];
+  tsShowAuth();
+}
+
+// ─── RESEND VERIFICATION ───
+async function tsResend() {
+  if (!tsPendingEmail) return;
+  const { error } = await sb.auth.resend({ type: 'signup', email: tsPendingEmail });
+  const msg = document.getElementById('verify-msg');
+  if (error) tsMsg(msg, error.message, 'error');
+  else tsMsg(msg, 'Confirmation email resent.', 'success');
+}
+
+// ─── SCREEN SWITCHES ───
+function tsShowAuth() {
+  document.getElementById('ts-auth').style.display = 'block';
+  document.getElementById('ts-verify').style.display = 'none';
+  document.getElementById('ts-dashboard').style.display = 'none';
+}
+function tsShowVerify() {
+  document.getElementById('ts-auth').style.display = 'none';
+  document.getElementById('ts-verify').style.display = 'block';
+  document.getElementById('ts-dashboard').style.display = 'none';
+}
+function tsShowDashboard() {
+  document.getElementById('ts-auth').style.display = 'none';
+  document.getElementById('ts-verify').style.display = 'none';
+  document.getElementById('ts-dashboard').style.display = 'block';
+}
+
+// ─── LOAD DASHBOARD ───
+async function tsLoadDashboard() {
+  const name = tsUser.user_metadata?.full_name || tsUser.email.split('@')[0];
+  document.getElementById('ts-user-name').textContent = 'Welcome back, ' + name;
+  await tsLoadChats();
+  tsShowDashboard();
+  if (tsChats.length === 0) tsNewChat();
+  else tsOpenChat(tsChats[0]);
+}
+
+// ─── LOAD CHATS FROM SUPABASE ───
+async function tsLoadChats() {
+  const { data } = await sb.from('chats').select('*')
+    .eq('user_id', tsUser.id).order('updated_at', { ascending: false }).limit(5);
+  tsChats = data || [];
+  tsRenderChatList();
+}
+
+// ─── RENDER SIDEBAR ───
+function tsRenderChatList() {
+  const list = document.getElementById('ts-chat-list');
+  const note = document.getElementById('ts-limit-note');
+  list.innerHTML = '';
+  tsChats.forEach(chat => {
+    const item = document.createElement('div');
+    item.className = 'ts-chat-item' + (tsActiveChat?.id === chat.id ? ' active' : '');
+    item.innerHTML = `
+      <div class="ts-chat-title">${chat.title || 'New Chat'}</div>
+      <div class="ts-chat-date">${new Date(chat.updated_at).toLocaleDateString()}</div>
+      <button class="ts-chat-del" onclick="tsDeleteChat('${chat.id}',event)" title="Delete">✕</button>
+    `;
+    item.onclick = (e) => { if (!e.target.classList.contains('ts-chat-del')) tsOpenChat(chat); };
+    list.appendChild(item);
+  });
+  if (tsChats.length >= 5) note.textContent = '5 chat limit reached. Delete a chat to start a new one.';
+  else note.textContent = `${tsChats.length}/5 chats saved`;
+}
+
+// ─── NEW CHAT ───
+async function tsNewChat() {
+  if (tsChats.length >= 5) {
+    alert('You have reached the 5 chat limit. Please delete a chat to start a new one.');
+    return;
+  }
+  const { data, error } = await sb.from('chats').insert({
+    user_id: tsUser.id, title: 'New Chat', messages: [], updated_at: new Date().toISOString()
+  }).select().single();
+  if (error) { console.error(error); return; }
+  tsChats.unshift(data);
+  tsRenderChatList();
+  tsOpenChat(data);
+}
+
+// ─── OPEN CHAT ───
+function tsOpenChat(chat) {
+  tsActiveChat = chat;
+  tsMessages = chat.messages || [];
+  tsRenderMessages();
+  tsRenderChatList();
+  if (tsMessages.length === 0) {
+    tsAppendMsg('ai', 'Welcome — glad you're here. I'm built to support everyone in the school building: planning, strategy, student needs, the hard conversations, the daily weight of the work. What's on your mind?');
+  }
+}
+
+// ─── DELETE CHAT ───
+async function tsDeleteChat(id, e) {
+  e.stopPropagation();
+  if (!confirm('Delete this chat?')) return;
+  await sb.from('chats').delete().eq('id', id);
+  tsChats = tsChats.filter(c => c.id !== id);
+  if (tsActiveChat?.id === id) {
+    tsActiveChat = null; tsMessages = [];
+    document.getElementById('ts-messages').innerHTML = '';
+    if (tsChats.length > 0) tsOpenChat(tsChats[0]);
+  }
+  tsRenderChatList();
+}
+
+// ─── RENDER MESSAGES ───
+function tsRenderMessages() {
+  const container = document.getElementById('ts-messages');
+  container.innerHTML = '';
+  tsMessages.forEach(m => tsAppendMsg(m.role === 'assistant' ? 'ai' : 'user', m.content, false));
+  container.scrollTop = container.scrollHeight;
+}
+
+// ─── APPEND MESSAGE ───
+function tsAppendMsg(role, content, scroll = true) {
+  const container = document.getElementById('ts-messages');
+  const div = document.createElement('div');
+  div.className = 'ts-msg ' + role;
+  if (role === 'ai') {
+    // Render markdown-like formatting
+    let html = content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^— (.+)$/gm, '<p>— $1</p>')
+      .replace(/^(\d+\)|\d+\.) (.+)$/gm, '<p>$1 $2</p>')
+      .replace(/
+
+/g, '</p><p>')
+      .replace(/
+/g, '<br>');
+    div.innerHTML = '<p>' + html + '</p>';
+
+    // Add Word doc button for substantial responses
+    if (content.length > 300) {
+      const docBtn = document.createElement('button');
+      docBtn.className = 'ts-doc-btn';
+      docBtn.innerHTML = '📄 Create Word Document';
+      docBtn.onclick = () => tsCreateDoc(content);
+      div.appendChild(docBtn);
+    }
+  } else {
+    div.textContent = content;
+  }
+  container.appendChild(div);
+  if (scroll) {
+    div.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// ─── SEND MESSAGE ───
+async function tsSend() {
+  const input = document.getElementById('ts-input');
+  const text = input.value.trim();
+  if (!text || tsLoading) return;
+  if (!tsActiveChat) { await tsNewChat(); }
+
+  tsLoading = true;
+  document.getElementById('ts-send-btn').disabled = true;
+  input.value = ''; input.style.height = 'auto';
+
+  tsMessages.push({ role: 'user', content: text });
+  tsAppendMsg('user', text);
+
+  // Typing indicator
+  const typing = document.createElement('div');
+  typing.className = 'ts-typing'; typing.id = 'ts-typing'; typing.textContent = 'ProphetApp AI is thinking...';
+  document.getElementById('ts-messages').appendChild(typing);
+  typing.scrollIntoView({ behavior: 'smooth' });
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ system: TS_SYSTEM_PROMPT, messages: tsMessages })
+    });
+    const data = await res.json();
+    document.getElementById('ts-typing')?.remove();
+    const reply = data?.content?.[0]?.text || 'Something went wrong. Please try again.';
+    tsMessages.push({ role: 'assistant', content: reply });
+    tsAppendMsg('ai', reply);
+
+    // Auto-title chat after first exchange
+    if (tsMessages.length === 2) {
+      const title = text.length > 40 ? text.substring(0, 40) + '...' : text;
+      await sb.from('chats').update({ title, messages: tsMessages, updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id);
+      tsActiveChat.title = title;
+    } else {
+      await sb.from('chats').update({ messages: tsMessages, updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id);
+    }
+    tsActiveChat.messages = tsMessages;
+    tsRenderChatList();
+
+  } catch (err) {
+    document.getElementById('ts-typing')?.remove();
+    tsAppendMsg('ai', 'Something interrupted us. Please try again.');
+  }
+
+  tsLoading = false;
+  document.getElementById('ts-send-btn').disabled = false;
+  input.focus();
+}
+
+// ─── WORD DOCUMENT GENERATOR ───
+async function tsCreateDoc(content) {
+  try {
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docx;
+
+    const lines = content.split('
+').filter(l => l.trim());
+    const children = [];
+
+    children.push(new Paragraph({
+      children: [new TextRun({ text: 'ProphetApp AI — Teachers Space', font: 'Arial', size: 20, color: '888888' })],
+      spacing: { after: 400 }
+    }));
+
+    lines.forEach(line => {
+      const clean = line.replace(/\*\*(.*?)\*\*/g, '$1').trim();
+      if (!clean) return;
+
+      if (line.startsWith('# ')) {
+        children.push(new Paragraph({
+          children: [new TextRun({ text: clean.replace(/^#+\s/, ''), font: 'Arial', size: 32, bold: true })],
+          spacing: { before: 320, after: 160 }
+        }));
+      } else if (line.startsWith('## ') || line.startsWith('**') && line.endsWith('**')) {
+        children.push(new Paragraph({
+          children: [new TextRun({ text: clean.replace(/^#+\s/, ''), font: 'Arial', size: 26, bold: true })],
+          spacing: { before: 240, after: 120 }
+        }));
+      } else if (line.startsWith('— ') || line.startsWith('- ')) {
+        children.push(new Paragraph({
+          children: [new TextRun({ text: clean.replace(/^[—\-]\s/, ''), font: 'Arial', size: 22 })],
+          bullet: { level: 0 },
+          spacing: { after: 80 }
+        }));
+      } else {
+        // Handle inline bold
+        const parts = line.split(/\*\*(.*?)\*\*/g);
+        const runs = parts.map((p, i) => new TextRun({ text: p, font: 'Arial', size: 22, bold: i % 2 === 1 }));
+        children.push(new Paragraph({ children: runs, spacing: { after: 120 } }));
+      }
+    });
+
+    const doc = new Document({
+      sections: [{ properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } }, children }]
+    });
+
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'ProphetApp-AI-Document.docx';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+
+  } catch (err) {
+    console.error('Doc generation error:', err);
+    alert('Document generation failed. Please try again.');
+  }
+}
+
+// ─── HELPER ───
+function tsMsg(el, msg, type) { el.textContent = msg; el.className = 'auth-msg ' + type; }
+
+// ─── INPUT AUTO-RESIZE + ENTER TO SEND ───
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('ts-input');
+  if (input) {
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); tsSend(); }
+    });
+  }
+});
+</script>
+
+
 </body>
 </html>
