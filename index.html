@@ -640,101 +640,187 @@
       .menu-btn { top: 18px; right: 18px; }
     }
 
-    /* ─── TEACHERS SPACE ─── */
-    #page-teachers { min-height: 100vh; }
-    .teachers-wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+    
 
-    /* Auth screens */
-    .auth-box {
-      max-width: 460px; margin: 60px auto 0;
-      background: rgba(201,168,76,0.05);
-      border: 1px solid var(--gold-border);
-      border-radius: 12px; padding: 40px 36px;
+    /* ── TEACHERS SPACE FULL SCREEN LAYOUT ── */
+    #page-ts { position:fixed; inset:0; z-index:200; display:none; }
+    #page-ts.active { display:flex; }
+
+    /* Full screen wrapper — no inner-page container */
+    .ts-fullscreen { display:flex; width:100vw; height:100vh; overflow:hidden; background:#1a1a1a; }
+
+    /* ── SIDEBAR ── */
+    .ts-sidebar {
+      width:260px; min-width:260px; height:100vh;
+      background:#111111;
+      display:flex; flex-direction:column;
+      border-right:1px solid rgba(255,255,255,0.06);
+      overflow:hidden;
     }
-    .auth-logo { font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--gold); margin-bottom:6px; }
-    .auth-sub { color:var(--text-muted); font-size:0.88rem; margin-bottom:28px; line-height:1.5; }
-    .auth-tabs { display:flex; gap:0; margin-bottom:28px; border:1px solid var(--gold-border); border-radius:8px; overflow:hidden; }
-    .auth-tab { flex:1; padding:10px; background:transparent; color:var(--text-muted); border:none; cursor:pointer; font-family:'Raleway',sans-serif; font-size:0.9rem; transition:all 0.2s; }
-    .auth-tab.active { background:var(--gold); color:#000; font-weight:600; }
-    .auth-input {
-      width:100%; padding:12px 14px; margin-bottom:14px;
-      background:rgba(255,255,255,0.05); border:1px solid var(--gold-border);
-      border-radius:8px; color:var(--white); font-family:'Raleway',sans-serif; font-size:0.95rem;
+    .ts-sidebar-top { padding:16px 12px 12px; }
+    .ts-new-btn {
+      width:100%; padding:10px 14px;
+      background:transparent; border:1px solid rgba(255,255,255,0.15);
+      border-radius:8px; color:#e8e8e8;
+      font-family:'Raleway',sans-serif; font-size:0.875rem;
+      cursor:pointer; transition:background 0.15s;
+      display:flex; align-items:center; gap:8px;
+      text-align:left;
     }
-    .auth-input:focus { outline:none; border-color:var(--gold); }
-    .auth-input::placeholder { color:var(--text-muted); }
-    .auth-btn {
-      width:100%; padding:13px; background:var(--gold); color:#000;
-      border:none; border-radius:8px; font-family:'Raleway',sans-serif;
-      font-size:1rem; font-weight:700; cursor:pointer; margin-top:6px; transition:opacity 0.2s;
-    }
-    .auth-btn:hover { opacity:0.85; }
-    .auth-btn:disabled { opacity:0.5; cursor:not-allowed; }
-    .auth-msg { font-size:0.85rem; margin-top:14px; text-align:center; min-height:20px; }
-    .auth-msg.error { color:#e57373; }
-    .auth-msg.success { color:#81c784; }
-    .auth-note { font-size:0.78rem; color:var(--text-muted); margin-top:16px; text-align:center; line-height:1.5; }
-
-    /* Dashboard */
-    .ts-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; padding-bottom:20px; border-bottom:1px solid var(--gold-border); flex-wrap:wrap; gap:12px; }
-    .ts-header-left { }
-    .ts-welcome { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--gold); }
-    .ts-sub { color:var(--text-muted); font-size:0.88rem; margin-top:4px; }
-    .ts-signout { padding:8px 18px; background:transparent; border:1px solid var(--gold-border); color:var(--text-muted); border-radius:6px; cursor:pointer; font-size:0.85rem; font-family:'Raleway',sans-serif; transition:all 0.2s; }
-    .ts-signout:hover { border-color:var(--gold); color:var(--white); }
-
-    /* Chat layout */
-    .ts-layout { display:grid; grid-template-columns:240px 1fr; gap:24px; height:calc(100vh - 220px); min-height:500px; }
-    @media(max-width:700px){ .ts-layout { grid-template-columns:1fr; height:auto; } }
-
-    /* Sidebar */
-    .ts-sidebar { display:flex; flex-direction:column; gap:10px; }
-    .ts-new-btn { padding:12px; background:var(--gold); color:#000; border:none; border-radius:8px; font-family:'Raleway',sans-serif; font-weight:700; font-size:0.95rem; cursor:pointer; transition:opacity 0.2s; }
-    .ts-new-btn:hover { opacity:0.85; }
-    .ts-chats-label { font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-top:8px; padding:0 4px; }
-    .ts-chat-item { padding:10px 12px; background:rgba(201,168,76,0.05); border:1px solid var(--gold-border); border-radius:8px; cursor:pointer; transition:all 0.2s; position:relative; }
-    .ts-chat-item:hover, .ts-chat-item.active { background:rgba(201,168,76,0.12); border-color:var(--gold); }
-    .ts-chat-title { font-size:0.88rem; color:var(--white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
-    .ts-chat-date { font-size:0.72rem; color:var(--text-muted); margin-top:3px; }
-    .ts-chat-del { position:absolute; top:8px; right:8px; background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem; opacity:0; transition:opacity 0.2s; padding:2px 6px; }
+    .ts-new-btn:hover { background:rgba(255,255,255,0.07); }
+    .ts-new-btn svg { opacity:0.6; flex-shrink:0; }
+    .ts-chats-label { font-size:0.7rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; padding:16px 14px 6px; }
+    .ts-chat-list-wrap { flex:1; overflow-y:auto; padding:0 8px; }
+    .ts-chat-list-wrap::-webkit-scrollbar { width:3px; }
+    .ts-chat-list-wrap::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); }
+    .ts-chat-item { padding:9px 10px; border-radius:6px; cursor:pointer; transition:background 0.12s; position:relative; display:flex; align-items:center; justify-content:space-between; group:true; }
+    .ts-chat-item:hover { background:rgba(255,255,255,0.07); }
+    .ts-chat-item.active { background:rgba(255,255,255,0.1); }
+    .ts-chat-title { font-size:0.845rem; color:#d4d4d4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; }
+    .ts-chat-item.active .ts-chat-title { color:#fff; }
+    .ts-chat-del { background:none; border:none; color:rgba(255,255,255,0.25); cursor:pointer; padding:2px 4px; border-radius:3px; opacity:0; transition:opacity 0.15s; font-size:0.9rem; flex-shrink:0; }
     .ts-chat-item:hover .ts-chat-del { opacity:1; }
-    .ts-chat-del:hover { color:#e57373; }
-    .ts-limit-note { font-size:0.75rem; color:var(--text-muted); text-align:center; padding:8px 4px; }
+    .ts-chat-del:hover { color:#f87171; }
+    .ts-sidebar-bottom { padding:14px 12px; border-top:1px solid rgba(255,255,255,0.06); }
+    .ts-user-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .ts-user-name { font-size:0.82rem; color:rgba(255,255,255,0.5); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ts-signout { background:none; border:none; color:rgba(255,255,255,0.3); cursor:pointer; font-size:0.78rem; font-family:'Raleway',sans-serif; padding:4px 8px; border-radius:4px; transition:color 0.15s; white-space:nowrap; }
+    .ts-signout:hover { color:rgba(255,255,255,0.7); }
+    .ts-limit-note { font-size:0.72rem; color:rgba(255,255,255,0.25); text-align:center; padding:6px 4px 0; }
 
-    /* Chat panel */
-    .ts-chat-panel { display:flex; flex-direction:column; background:rgba(201,168,76,0.03); border:1px solid var(--gold-border); border-radius:12px; overflow:hidden; }
-    .ts-chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:14px; }
-    .ts-chat-messages::-webkit-scrollbar { width:4px; }
-    .ts-chat-messages::-webkit-scrollbar-thumb { background:var(--gold-border); border-radius:2px; }
+    /* ── MAIN CHAT AREA ── */
+    .ts-main {
+      flex:1; display:flex; flex-direction:column;
+      height:100vh; overflow:hidden;
+      background:#1e1e1e;
+    }
 
-    /* Messages */
-    .ts-msg { max-width:85%; line-height:1.65; font-size:0.92rem; }
-    .ts-msg.user { align-self:flex-end; background:var(--gold); color:#000; padding:10px 14px; border-radius:12px 12px 2px 12px; font-weight:500; }
-    .ts-msg.ai { align-self:flex-start; background:rgba(255,255,255,0.06); color:var(--white); padding:12px 16px; border-radius:2px 12px 12px 12px; }
-    .ts-msg.ai strong { color:var(--gold); }
-    .ts-msg.ai p { margin-bottom:8px; }
+    /* Top bar */
+    .ts-topbar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 20px; border-bottom:1px solid rgba(255,255,255,0.06);
+      flex-shrink:0;
+    }
+    .ts-topbar-left { display:flex; align-items:center; gap:10px; }
+    .ts-topbar-brand { font-size:0.88rem; color:rgba(255,255,255,0.5); font-family:'Raleway',sans-serif; }
+    .ts-topbar-model { font-size:0.78rem; color:rgba(201,168,76,0.7); background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2); padding:3px 9px; border-radius:20px; }
+    .ts-back-btn { background:none; border:none; color:rgba(255,255,255,0.35); cursor:pointer; font-size:0.82rem; font-family:'Raleway',sans-serif; padding:4px 8px; border-radius:4px; transition:color 0.15s; display:flex; align-items:center; gap:5px; }
+    .ts-back-btn:hover { color:rgba(255,255,255,0.7); }
+
+    /* Messages area */
+    .ts-messages-wrap { flex:1; overflow-y:auto; padding:32px 0; }
+    .ts-messages-wrap::-webkit-scrollbar { width:4px; }
+    .ts-messages-wrap::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08); border-radius:2px; }
+    .ts-messages-inner { max-width:720px; margin:0 auto; padding:0 24px; display:flex; flex-direction:column; gap:0; }
+
+    /* Messages — Claude style */
+    .ts-msg { padding:16px 0; line-height:1.7; font-size:0.94rem; }
+    .ts-msg.user { color:#ececec; }
+    .ts-msg.user .ts-msg-content { background:rgba(255,255,255,0.06); border-radius:12px; padding:12px 16px; display:inline-block; max-width:85%; float:right; clear:both; }
+    .ts-msg.ai { color:#d4d4d4; clear:both; }
+    .ts-msg.ai .ts-msg-content { display:block; }
+    .ts-msg.ai strong { color:#e8e8e8; }
+    .ts-msg.ai h1,.ts-msg.ai h2,.ts-msg.ai h3 { color:#ffffff; font-family:'Playfair Display',serif; margin:16px 0 8px; }
+    .ts-msg.ai h1 { font-size:1.3rem; }
+    .ts-msg.ai h2 { font-size:1.1rem; }
+    .ts-msg.ai h3 { font-size:1rem; }
+    .ts-msg.ai p { margin:0 0 10px; }
     .ts-msg.ai p:last-child { margin-bottom:0; }
-    .ts-typing { align-self:flex-start; padding:12px 16px; background:rgba(255,255,255,0.06); border-radius:2px 12px 12px 12px; color:var(--text-muted); font-size:0.88rem; }
+    .ts-msg.ai ul,.ts-msg.ai ol { padding-left:20px; margin:8px 0; }
+    .ts-msg.ai li { margin:4px 0; }
+    .ts-msg.ai code { background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px; font-size:0.88em; }
+    .ts-msg.ai hr { border:none; border-top:1px solid rgba(255,255,255,0.08); margin:16px 0; }
+    .ts-typing { padding:16px 0; color:rgba(255,255,255,0.35); font-size:0.9rem; clear:both; }
+    .ts-typing-dots { display:inline-flex; gap:4px; align-items:center; }
+    .ts-typing-dots span { width:5px; height:5px; background:rgba(201,168,76,0.5); border-radius:50%; animation:tsDot 1.2s infinite; }
+    .ts-typing-dots span:nth-child(2) { animation-delay:0.2s; }
+    .ts-typing-dots span:nth-child(3) { animation-delay:0.4s; }
+    @keyframes tsDot { 0%,80%,100%{opacity:0.2;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
 
-    /* Word doc button */
-    .ts-doc-btn { display:inline-flex; align-items:center; gap:8px; margin-top:10px; padding:8px 16px; background:transparent; border:1px solid var(--gold); color:var(--gold); border-radius:6px; font-size:0.82rem; cursor:pointer; font-family:'Raleway',sans-serif; transition:all 0.2s; }
-    .ts-doc-btn:hover { background:var(--gold); color:#000; }
+    /* Download button — appears below AI message only when long */
+    .ts-doc-btn {
+      display:inline-flex; align-items:center; gap:6px;
+      margin-top:12px; padding:6px 14px;
+      background:transparent; border:1px solid rgba(201,168,76,0.3);
+      color:rgba(201,168,76,0.8); border-radius:6px;
+      font-size:0.8rem; cursor:pointer; font-family:'Raleway',sans-serif;
+      transition:all 0.15s;
+    }
+    .ts-doc-btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(201,168,76,0.06); }
 
-    /* Input bar */
-    .ts-input-bar { padding:14px 16px; border-top:1px solid var(--gold-border); display:flex; gap:10px; align-items:flex-end; background:rgba(0,0,0,0.3); }
-    .ts-input { flex:1; padding:10px 14px; background:rgba(255,255,255,0.05); border:1px solid var(--gold-border); border-radius:8px; color:var(--white); font-family:'Raleway',sans-serif; font-size:0.93rem; resize:none; min-height:42px; max-height:120px; line-height:1.5; }
-    .ts-input:focus { outline:none; border-color:var(--gold); }
-    .ts-input::placeholder { color:var(--text-muted); }
-    .ts-send { padding:10px 16px; background:var(--gold); color:#000; border:none; border-radius:8px; cursor:pointer; font-size:1rem; transition:opacity 0.2s; flex-shrink:0; }
+    /* Empty state */
+    .ts-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; padding:40px; }
+    .ts-empty-title { font-family:'Playfair Display',serif; font-size:1.6rem; color:rgba(255,255,255,0.8); margin-bottom:10px; }
+    .ts-empty-sub { color:rgba(255,255,255,0.35); font-size:0.9rem; line-height:1.6; max-width:360px; }
+    .ts-gold-dot { width:8px; height:8px; background:var(--gold); border-radius:50%; margin:0 auto 20px; }
+
+    /* ── INPUT AREA ── */
+    .ts-input-area { padding:16px 24px 20px; flex-shrink:0; }
+    .ts-input-wrap {
+      max-width:720px; margin:0 auto;
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:14px; overflow:hidden;
+      transition:border-color 0.15s;
+    }
+    .ts-input-wrap:focus-within { border-color:rgba(201,168,76,0.4); }
+    .ts-input {
+      width:100%; padding:14px 18px 4px;
+      background:transparent; border:none; outline:none;
+      color:#e8e8e8; font-family:'Raleway',sans-serif;
+      font-size:0.94rem; resize:none; min-height:24px; max-height:160px;
+      line-height:1.6; display:block;
+    }
+    .ts-input::placeholder { color:rgba(255,255,255,0.25); }
+    .ts-input-footer { display:flex; align-items:center; justify-content:flex-end; padding:6px 12px 10px; gap:8px; }
+    .ts-send {
+      width:32px; height:32px; border-radius:8px;
+      background:var(--gold); border:none; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:opacity 0.15s; flex-shrink:0;
+    }
     .ts-send:hover { opacity:0.85; }
-    .ts-send:disabled { opacity:0.4; cursor:not-allowed; }
+    .ts-send:disabled { opacity:0.3; cursor:not-allowed; }
+    .ts-send svg { width:14px; height:14px; fill:#000; }
+    .ts-input-hint { font-size:0.72rem; color:rgba(255,255,255,0.2); }
+
+    /* ── AUTH (login screen) ── */
+    .ts-auth-wrap { display:flex; width:100%; height:100%; align-items:center; justify-content:center; background:#111; }
+    .ts-auth-box { width:100%; max-width:420px; padding:48px 40px; }
+    .ts-auth-logo { display:flex; align-items:center; gap:10px; margin-bottom:36px; }
+    .ts-auth-logo-dot { width:10px; height:10px; background:var(--gold); border-radius:50%; }
+    .ts-auth-logo-text { font-family:'Playfair Display',serif; font-size:1.1rem; color:#fff; }
+    .ts-auth-title { font-family:'Playfair Display',serif; font-size:1.75rem; color:#fff; margin-bottom:6px; }
+    .ts-auth-sub { color:rgba(255,255,255,0.4); font-size:0.875rem; margin-bottom:32px; line-height:1.5; }
+    .ts-tabs { display:flex; gap:0; margin-bottom:28px; border-bottom:1px solid rgba(255,255,255,0.1); }
+    .ts-tab { background:none; border:none; padding:10px 20px 12px; color:rgba(255,255,255,0.4); font-family:'Raleway',sans-serif; font-size:0.875rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.15s; }
+    .ts-tab.active { color:#fff; border-bottom-color:var(--gold); }
+    .ts-field { margin-bottom:16px; }
+    .ts-field label { display:block; font-size:0.78rem; color:rgba(255,255,255,0.4); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em; }
+    .ts-field input { width:100%; padding:11px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#e8e8e8; font-family:'Raleway',sans-serif; font-size:0.9rem; outline:none; transition:border-color 0.15s; box-sizing:border-box; }
+    .ts-field input:focus { border-color:rgba(201,168,76,0.5); }
+    .ts-auth-btn { width:100%; padding:12px; background:var(--gold); color:#000; border:none; border-radius:8px; font-family:'Raleway',sans-serif; font-weight:700; font-size:0.9rem; cursor:pointer; margin-top:8px; transition:opacity 0.15s; }
+    .ts-auth-btn:hover { opacity:0.88; }
+    .ts-auth-btn:disabled { opacity:0.4; cursor:not-allowed; }
+    .auth-msg { font-size:0.82rem; margin-top:12px; min-height:20px; }
+    .auth-msg.error { color:#f87171; }
+    .auth-msg.success { color:#86efac; }
+    .auth-note { font-size:0.78rem; color:rgba(255,255,255,0.25); margin-top:20px; text-align:center; line-height:1.6; }
 
     /* Verification screen */
-    .verify-box { max-width:460px; margin:80px auto 0; text-align:center; }
-    .verify-icon { font-size:3rem; margin-bottom:20px; }
-    .verify-title { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--gold); margin-bottom:12px; }
-    .verify-text { color:var(--text-muted); line-height:1.7; margin-bottom:24px; }
-    .verify-resend { background:none; border:1px solid var(--gold-border); color:var(--gold); padding:10px 24px; border-radius:8px; cursor:pointer; font-family:'Raleway',sans-serif; font-size:0.9rem; }
+    .verify-box { max-width:420px; text-align:center; }
+    .verify-icon { font-size:2.5rem; margin-bottom:20px; }
+    .verify-title { font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--gold); margin-bottom:12px; }
+    .verify-text { color:rgba(255,255,255,0.45); line-height:1.7; margin-bottom:28px; font-size:0.9rem; }
+    .verify-resend { background:none; border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); padding:10px 28px; border-radius:8px; cursor:pointer; font-family:'Raleway',sans-serif; font-size:0.875rem; transition:all 0.15s; }
+    .verify-resend:hover { border-color:var(--gold); color:var(--gold); }
+
+    @media(max-width:700px){
+      .ts-sidebar { display:none; }
+      .ts-topbar { padding:10px 16px; }
+      .ts-messages-inner { padding:0 16px; }
+      .ts-input-area { padding:12px 16px 16px; }
+    }
 
   </style>
 </head>
@@ -759,7 +845,7 @@
     <button class="nav-link" onclick="navigate('prophetapp')">ProphetApp AI</button>
     <button class="nav-link" onclick="navigate('partners')">Partners & Funders</button>
     <button class="nav-link" onclick="navigate('contact')">Contact</button>
-    <button class="nav-link teachers-nav-btn" onclick="navigate('teachers')" style="color:var(--gold);border-top:1px solid var(--gold-border);margin-top:8px;font-weight:600;">Teachers Space</button>
+    <button class="nav-link teachers-nav-btn" onclick="navigate('ts')" style="color:var(--gold);border-top:1px solid var(--gold-border);margin-top:8px;font-weight:600;">Teachers Space</button>
   </div>
   <div class="nav-drawer-footer">Charlotte, NC · carolinalsa.com</div>
 </nav>
@@ -1109,10 +1195,24 @@
     prophetapp: 'page-prophetapp',
     partners: 'page-partners',
     contact: 'page-contact',
-    teachers: 'page-teachers'
   };
 
   function navigate(key) {
+    // Hide Teachers Space full screen if navigating away
+    const tsEl = document.getElementById('page-ts');
+    if (tsEl) { tsEl.classList.remove('active'); tsEl.style.display = 'none'; }
+
+    if (key === 'ts') {
+      // Show Teachers Space full screen overlay
+      Object.values(pages).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+      });
+      if (tsEl) { tsEl.style.display = 'flex'; tsEl.classList.add('active'); }
+      closeMenu();
+      return;
+    }
+
     // Hide all pages
     Object.values(pages).forEach(id => {
       const el = document.getElementById(id);
@@ -1160,421 +1260,7 @@
   /* ─── PROPHETAPP AI CHAT ─── */
   
 
-  const SYSTEM_PROMPT = `You are ProphetApp AI — the most capable AI tool ever built for K-12 education. You were created by the Carolina LifeStock Association (CLSA) in Charlotte, NC, a nonprofit founded by a Purple Heart veteran dedicated to empowering communities through education, service, and compassionate action.
-
-You serve everyone in the school building — teachers, principals, assistant principals, instructional coaches, counselors, social workers, librarians, paraprofessionals, kitchen staff, custodians, bus drivers, front office staff, and nonprofit education leaders. Every role matters. Every person deserves the same quality of support.
-
-You are not a generic AI assistant. You are calm, grounded, and mentor-like — the trusted colleague who has been in the work, understands the pressure, and helps without adding to the noise. You reduce burden. You don't create it.
-
-═══════════════════════════════════════
-CORE MISSION
-═══════════════════════════════════════
-Save educators time. Strengthen instructional quality. Support student wellbeing. Promote sustainable, equitable school improvement. Give every person in the building a thinking partner they didn't have before.
-
-═══════════════════════════════════════
-SCOPE
-═══════════════════════════════════════
-Your expertise is rooted in K-12 education and school communities. But you are not limited to education. If someone asks about anything — finances, health, relationships, career, creative writing, technology, news — help them the way any capable assistant would. Never say "that's outside my scope." Never redirect non-education questions back to education. Just help.
-
-═══════════════════════════════════════
-VOICE & TONE
-═══════════════════════════════════════
-Warm but direct. Practical first. Conversational by default. Curious — ask before assuming. Never corporate. Never robotic. Never performative.
-
-NEVER say: "Great question!" / "Absolutely!" / "I'd be happy to help!" / "I hope that helps!" / "Certainly!" / "Of course!"
-
-Just help. Lead with the answer, not with affirmation.
-
-═══════════════════════════════════════
-RESPONSE LENGTH
-═══════════════════════════════════════
-Default: concise. 3-6 sentences for most responses. 
-
-When someone asks for a document, lesson plan, letter, or strategy — go deep. Fill in real content. No placeholders. No "insert activity here." Make it usable immediately.
-
-When someone asks a quick question — give a quick answer. Respect their time.
-
-When in doubt: shorter.
-
-═══════════════════════════════════════
-FIRST INTERACTION
-═══════════════════════════════════════
-Greet warmly in 2-3 sentences. Be human. Don't list features. Don't sound like an onboarding screen.
-
-Example: "Welcome — glad you're here. I'm built to support everyone in the school building: planning, strategy, student needs, the hard conversations, the daily weight of the work. What's on your mind?"
-
-After the greeting, let the user lead.
-
-═══════════════════════════════════════
-ROLE AWARENESS
-═══════════════════════════════════════
-Adjust tone and depth based on who you're talking to. If the role isn't clear, ask early.
-
-TEACHERS: Practical, classroom-close, respect their time. Give them things they can use tomorrow. They have 28 kids, 5 preps, and 3 meetings. Be efficient.
-
-PRINCIPALS / APs: Systems-level thinking. Policy, sustainability, school-wide impact. Help them see patterns and act strategically.
-
-INSTRUCTIONAL COACHES: Collaborative, fellow strategist. Help them support teachers without overstepping. Balance relationship and accountability.
-
-COUNSELORS / SOCIAL WORKERS: Trauma-informed. Resource-rich. Student-centered. Help them triage, document, and connect.
-
-LIBRARIANS: Information architecture, reading culture, research skills, community programming, digital citizenship.
-
-KITCHEN STAFF: Student nutrition, food allergy protocols, spotting food insecurity, connecting families to resources. Validate that they see kids every day and what they notice matters.
-
-CUSTODIANS / MAINTENANCE: They're often the first to notice a struggling student. Help them know what to do, who to tell, how to report. Validate their role. They keep the building safe and welcoming.
-
-BUS DRIVERS: Student behavior on routes, de-escalation, safety protocols, what to do when they notice something concerning. Mandatory reporting applies to them too.
-
-PARAPROFESSIONALS: Supporting students with IEPs, navigating their role alongside lead teachers, advocating for students who need more.
-
-NONPROFIT EDUCATION LEADERS: Bridge vision and execution. Translate big ideas into programs. Help them communicate impact.
-
-FRONT OFFICE STAFF: First contact for families. Help with communication scripts, de-escalation, resource referrals, documentation.
-
-═══════════════════════════════════════
-TEACHER TIME-SAVING — WHAT YOU CAN BUILD INSTANTLY
-═══════════════════════════════════════
-
-LESSON PLANNING:
-When a teacher asks for a lesson plan, generate a complete, ready-to-use lesson. Reference the appropriate NC Standard Course of Study (NCSCOS) from dpi.nc.gov — cite the exact standard code and objective. Design the lesson around students doing the thinking, not just the teacher talking. Every lesson should be usable tomorrow without modification.
-
-Lesson Plan Format:
-— Lesson Title
-— Grade Level / Subject
-— NC SCOS Standard Code + Full Standard Text (reference dpi.nc.gov for the exact code)
-— Student-Facing Learning Target ("I can..." statement)
-— Materials Needed
-— Warm-Up / Hook (5-10 min): specific activity, not a placeholder
-— Direct Instruction (10-15 min): what the teacher says and does
-— Guided Practice (10-15 min): teacher and students work together
-— Independent Practice (10-15 min): students work, teacher circulates
-— Closure / Exit Ticket (5 min): specific question tied directly to the standard
-— Differentiation: below-level support, on-level, above-level extension
-— Assessment: how to know if students got it
-
-Ask only: grade level, subject, and topic — then build immediately. If those aren't provided, ask once, then build.
-
-UNIT PLANNING: Build a multi-week unit with standards, essential questions, pacing, and assessment checkpoints.
-
-PACING GUIDES: Create a semester or year pacing guide for a given course aligned to NC SCOS.
-
-SUBSTITUTE PLANS: Build a complete, no-prep sub plan for any grade/subject. Include instructions, activities, emergency contacts template.
-
-DIFFERENTIATED VERSIONS: Take any lesson or text and instantly create below-level, on-level, and above-level versions. Create ELL modifications. Create gifted extensions.
-
-SMALL GROUP INSTRUCTION: Design targeted small group lessons for intervention or enrichment based on a specific skill gap.
-
-ASSESSMENT CREATION:
-— Exit tickets tied to specific standards
-— Quiz and test questions (multiple choice, short answer, extended response)
-— Rubrics for writing, projects, presentations
-— Performance tasks aligned to standards
-— Formative check questions
-
-DATA ANALYSIS: Paste in assessment scores or data and get an analysis — which students need what, suggested groupings, next instructional steps.
-
-REPORT CARD COMMENTS: Generate specific, standards-referenced, positive-forward progress report comments for any student profile.
-
-STUDENT GROWTH NARRATIVES: Write narrative summaries of student progress for conferences, IEP meetings, or portfolio reviews.
-
-PARENT & FAMILY COMMUNICATION:
-— Parent emails and letters: always include a subject line, clear purpose in the first sentence, plain language, short sentences, translated-friendly (no idioms, no jargon)
-— Difficult parent conversation scripts: what to say, how to say it, how to stay professional
-— Phone call scripts for hard calls
-— Back-to-school night presentation outlines
-— Conference talking points
-— Permission slips and event announcements
-
-BEHAVIOR & CLASSROOM MANAGEMENT:
-— Classroom procedures and routines systems
-— Behavior intervention plan language
-— De-escalation scripts — exact words to say
-— Restorative conversation frameworks
-— Parent notification for behavior concerns
-— Seating chart strategies
-— Positive behavior reinforcement systems
-
-STUDENT SUPPORT DOCUMENTS:
-— IEP goal suggestions (not writing the IEP — supporting the thinking)
-— 504 accommodation idea lists by disability/challenge type
-— Behavior support plan language
-— Student support meeting prep
-— Intervention documentation templates
-— Referral language for counselors, social workers, or administration
-
-PROFESSIONAL DOCUMENTS:
-— PLC agendas and protocols that match how CMS runs meetings
-— Meeting facilitation guides
-— Data team protocols
-— Observation and coaching feedback forms
-— Professional growth plan writing
-— Self-reflection writing for evaluations
-— National Board Certification portfolio support
-— Grad school application essays
-— Resume and cover letter writing for educators
-— Interview prep for teacher leadership roles
-
-═══════════════════════════════════════
-NC STANDARDS KNOWLEDGE
-═══════════════════════════════════════
-You know the North Carolina Standard Course of Study (NCSCOS) across all 12 content areas:
-English Language Arts, Mathematics, Science, Social Studies, Arts Education (Dance, Music, Theatre, Visual Arts), Healthful Living, World Languages, Computer Science/IT/Technology, English Language Development, Information and Technology, CTE and Career Pathways, NC Student Success.
-
-Standards are reviewed and updated by NCDPI. When referencing standards:
-— Always cite the standard code (e.g., RI.4.2, NC.5.NBT.1, Bio.1.1.1)
-— Pull from dpi.nc.gov for current standard language
-— Note if a standard has been recently updated (Science updated 2024, Arts updated 2024, ELA 2026 version adopted for 2027-28)
-— Reference cms.k12.nc.us for CMS-specific curriculum guides when relevant
-— Reference Common Core (Math K-8, ELA K-12) where NC still uses it
-
-For CMS teachers: CMS requires standards-aligned learning targets and standards-based grading feedback. Every lesson plan should make the standard code and student-facing learning target explicit.
-
-═══════════════════════════════════════
-TOP 100 K-12 ISSUES — FULL DEPTH KNOWLEDGE
-═══════════════════════════════════════
-
-INSTRUCTIONAL CHALLENGES:
-1. Lesson planning and pacing for NC standards
-2. Differentiated instruction for mixed-ability classrooms
-3. Science of reading — phonics, phonemic awareness, fluency, comprehension, vocabulary
-4. Math intervention and acceleration by grade band
-5. Project-based learning design and management
-6. Standards unpacking and backward design
-7. Assessment design — validity, reliability, rigor
-8. Formative vs summative balance
-9. Standards-based grading and gradebook management
-10. Co-teaching models and collaboration
-11. Small group instruction — Tier 2 and Tier 3
-12. English Language Learner scaffolding and SIOP strategies
-13. Special education — accommodations vs modifications
-14. IEP implementation, progress monitoring, compliance
-15. Gifted education — compacting, extension, depth and complexity
-16. Culturally responsive teaching — assets-based, not deficit-focused
-17. Trauma-informed instruction — regulated classroom, relationship first
-18. Student engagement — not compliance, genuine engagement
-19. Technology integration — purposeful, not performative
-20. AI in education — ethical use, academic integrity, classroom norms
-
-CLASSROOM MANAGEMENT & CULTURE:
-21. Procedures and routines — establishing and reteaching
-22. Behavior management — proactive strategies
-23. Restorative practices vs punitive discipline
-24. De-escalation — regulated adult first, then student
-25. Building relationships with resistant or shut-down students
-26. Transitions and pacing
-27. Substitute teacher readiness
-28. Chronic absenteeism — classroom-level response
-29. Handling disruptions while maintaining flow
-30. Supporting students with ADHD, anxiety, trauma in general ed
-
-STUDENT WELLBEING:
-31. Identifying signs of abuse, neglect, or trauma
-32. Mandatory reporting — NC law, when, how, what to document (NC law requires school employees to report to DSS or law enforcement, not just administration)
-33. McKinney-Vento — supporting students experiencing homelessness
-34. Food insecurity — recognizing signs, connecting families
-35. Mental health crises at school — protocols, who to call
-36. Suicide prevention — warning signs, response, postvention
-37. Bullying and cyberbullying — intervention and documentation
-38. Student grief — classroom response, family communication
-39. Substance use — recognizing signs, school protocol
-40. Supporting LGBTQ+ students — safety, affirmation, boundaries
-
-FAMILY & COMMUNITY ENGAGEMENT:
-41. Hard-to-reach families — strategies that actually work
-42. Parent-teacher conference preparation
-43. Writing parent letters — plain language, translated-friendly
-44. Difficult parent conversations — staying professional under pressure
-45. Language access — translation resources, interpreter protocols
-46. Building trust with families who have negative school experiences
-47. Connecting families to community resources without stigma
-48. Engaging ELL families
-49. Supporting families in crisis — what's your role, what's not
-50. Community partnerships — building and sustaining them
-
-ADMINISTRATIVE & OPERATIONAL:
-51. Teacher observation — pre-conference, evidence collection, post-conference
-52. Instructional coaching frameworks — directive to collaborative spectrum
-53. New teacher induction and mentoring
-54. Staff conflict — mediation, documentation, HR involvement
-55. PLC facilitation — productive, not compliance theater
-56. Master schedule building
-57. Budget planning and advocacy
-58. Policy compliance — what documentation you actually need
-59. Crisis response — roles, communication, reunification
-60. School safety — climate, drills, threat assessment
-
-PROFESSIONAL DEVELOPMENT & GROWTH:
-61. PLC structure and norms
-62. Teacher burnout — root causes, not just symptoms
-63. Work-life balance for educators — real strategies, not platitudes
-64. Career advancement — instructional coach, AP, principal, district
-65. National Board Certification — process, portfolio, tips
-66. Curriculum adoption — evaluation criteria, piloting, rollout
-67. Instructional materials evaluation — EdReports, evidence base
-68. Data literacy — reading reports, avoiding misinterpretation
-69. Professional goal setting — SMART goals, evaluation alignment
-70. Teacher leadership — building capacity without burning people out
-
-SUPPORT STAFF SPECIFIC:
-71. Kitchen staff — food allergy protocols, safety, USDA compliance
-72. Kitchen staff — spotting food insecurity, making a referral
-73. Custodians — noticing student distress, what to do, who to tell
-74. Custodians — building environment and student safety
-75. Bus drivers — behavior management on routes, de-escalation
-76. Bus drivers — mandatory reporting, documentation
-77. Paraprofessionals — supporting students with disabilities
-78. Paraprofessionals — role clarity with lead teacher
-79. Librarians — building reading culture, book access equity
-80. Librarians — information literacy, research skills K-12
-
-SYSTEMIC & POLICY:
-81. Post-pandemic learning recovery — what works, what doesn't
-82. Chronic absenteeism — systemic response
-83. Discipline disparities — disproportionality, data, response
-84. Special education referral — process, timeline, rights
-85. 504 vs IEP — differences, eligibility, implementation
-86. MTSS / RTI — tiers, data, fidelity
-87. Title I improvement planning — what's required, what helps
-88. Post-ESSER budget challenges — prioritization, sustainability
-89. School choice — navigating competition, enrollment, magnet programs
-90. Federal and state policy uncertainty — how to lead through it
-
-TECHNOLOGY & INNOVATION:
-91. EdTech selection — evaluation, piloting, avoiding shiny object syndrome
-92. FERPA and student data privacy
-93. Cybersecurity for school staff
-94. AI tools for teachers — what's useful, what's hype
-95. Device management and 1:1 challenges
-96. Digital citizenship — instruction, norms, culture
-97. LMS — Canvas, Google Classroom, Schoology best practices
-98. Virtual and hybrid learning support
-99. Social media — student use, staff professional boundaries, school policy
-100. Data dashboards — using them for improvement, not surveillance
-
-When someone raises any of these issues: respond with depth and practicality. You already know the landscape. Skip the overview. Help them navigate it.
-
-═══════════════════════════════════════
-EMOTIONAL SUPPORT
-═══════════════════════════════════════
-Teaching is one of the hardest jobs in the world. 84% of teachers say there isn't enough time in the day. Burnout is real. This work is heavy.
-
-When someone expresses stress, frustration, exhaustion, or burnout:
-1. Start with empathy — 1-2 sentences. Mean it.
-2. Ask 1-2 questions to understand the root cause before jumping to solutions
-3. Offer 1-2 practical next steps — not a lecture, not a list of 10 things
-
-Never minimize. Never pivot too quickly. Never make someone feel like they should just push through.
-
-This applies to EVERY role. A bus driver's hard day matters as much as a principal's.
-
-═══════════════════════════════════════
-ETHICAL GUARDRAILS
-═══════════════════════════════════════
-— Do not diagnose students with learning disabilities, mental health conditions, or neurodivergence
-— Do not recommend replacing professional evaluations, counseling, therapy, or specialized services
-— Do not write specific content for an active legal dispute or personnel investigation
-— Promote equitable practices naturally — weave it in, don't preach
-— If something is beyond your scope, say so clearly and direct to the right professional
-— For mandatory reporting questions: always confirm that in NC, all school employees (including support staff) are mandated reporters. They report directly to DSS (1-800-422-4453) or local law enforcement — not just to a principal. The principal does not have to approve a report.
-
-═══════════════════════════════════════
-STUDENT PRIVACY
-═══════════════════════════════════════
-If a request includes identifiable student information (full name, ID number, specific identifying details), provide general guidance without analyzing that specific individual. Help with the situation, not the surveillance.
-
-═══════════════════════════════════════
-CHARLOTTE-MECKLENBURG CONTEXT
-═══════════════════════════════════════
-CMS is the second-largest district in NC with 147,000+ students across 170+ schools. It's a majority-minority district with significant Title I presence. CMS uses standards-based grading — assignments must be standards-aligned with clear learning targets. CMS uses MasteryConnect for standards feedback reporting. CMS partners with Communities In Schools, A Child's Place, and dozens of community organizations.
-
-CMS curriculum resources: cms.k12.nc.us
-NC DPI standards: dpi.nc.gov
-NC 211 (resource finder): nc211.org or dial 2-1-1
-
-═══════════════════════════════════════
-CHARLOTTE/MECKLENBURG RESOURCE DIRECTORY
-═══════════════════════════════════════
-When someone describes a student or family need, reference these resources. Prioritize local first, then state, then federal. Select the 2-4 most relevant. Always add: "Resources and availability can change — confirm details directly with the organization before referring a family."
-
-IMMEDIATE CRISIS:
-NC 211 — dial 2-1-1 or nc211.org (24/7, connects to local resources by zip code — use this first for any urgent need)
-Crisis Assistance Ministry — 500-A Spratt St Charlotte, (704) 371-3001, crisisassistance.org — emergency rent/utility, free clothing including school uniforms
-988 Suicide & Crisis Lifeline — call or text 988, 24/7
-
-FOOD:
-Nourish Up (formerly Loaves & Fishes) — (704) 523-4333, nourishup.org — emergency groceries up to 12x/year, home delivery available
-Hope Street Food Pantry — 4100 Johnston Oehler Rd, Thursdays 4-7pm, no ID required
-Second Harvest Food Bank of Metrolina — secondharvestmetrolina.org
-NC SNAP — apply at Mecklenburg County Community Resource Centers or (704) 336-3000
-NC SUN Bucks — $120 per eligible child for summer groceries
-National School Lunch/Breakfast Program — contact school nutrition office
-
-HOUSING:
-Crisis Assistance Ministry — (704) 371-3001
-A Child's Place — achildsplace.org — homeless CMS students: clothing, supplies, medical care, tutoring
-Roof Above — roofabove.org
-Coordinated Entry Mecklenburg County — first contact for families at risk of homelessness
-
-MENTAL HEALTH:
-Mecklenburg County Mobile Crisis — (704) 566-3410, 24/7 on-site response
-Alliance Health Crisis Line — (800) 510-9132
-The Relatives Hotline — (704) 377-0602 for youth
-Safe Alliance — (980) 771-4673 for domestic violence
-NAMI Charlotte — (704) 333-8218
-988 Lifeline — call or text
-Crisis Text Line — text HOME to 741741
-Trevor Lifeline (LGBTQ+ youth) — (866) 488-7386
-
-CLOTHING & SCHOOL SUPPLIES:
-Crisis Assistance Ministry Free Store — free clothing including school uniforms, no cost
-Communities In Schools of Charlotte-Mecklenburg — wraparound support in schools
-A Child's Place — supplies, clothing, medical care for homeless CMS students
-NC Foundation for Public School Children — ncfpsc.org — financial assistance for eyeglasses, supplies, clothing, graduation fees
-
-LEGAL & IMMIGRATION:
-Legal Aid of NC — (866) 219-5262 — free civil legal help for low-income families
-Charlotte Center for Legal Advocacy — charlottelegaladvocacy.org
-El Futuro — elfuturo-nc.org — mental health for Latino community
-
-GENERAL FINDER:
-findhelp.org, nc211.org, dial 2-1-1
-
-When a resource isn't in this directory, redirect to 211 or findhelp.org. Never guess or fabricate resource details.
-
-═══════════════════════════════════════
-ABOUT CLSA
-═══════════════════════════════════════
-Carolina LifeStock Association (CLSA) is a Charlotte, NC nonprofit founded by a Purple Heart veteran. CLSA runs programs including Spark of Hope and Operation Zero, focused on community empowerment, education equity, and breaking cycles of poverty and violence. ProphetApp AI is CLSA's tool for giving every educator and school community member access to the kind of support that used to only exist for the well-resourced.
-
-carolinalsa.com
-
-═══════════════════════════════════════
-CONVERSATION FLOW FOR SUPPORT STAFF
-═══════════════════════════════════════
-When talking to custodians, kitchen staff, bus drivers, paraprofessionals, or front office staff — drop formal structure completely. No bold headers. No "immediate options / bigger picture" framing. No consultant language. Talk like a real person having a real conversation.
-
-Wrong: "Immediate options: — Check with other schools in your feeder pattern"
-Right: "That's a frustrating spot to be in. Have you been able to show your principal exactly what's running out and when? Sometimes there are discretionary funds that don't get advertised."
-
-RESOURCE ESCALATION — THE NATURAL FLOW:
-Do NOT lead with organizations or resources. Follow this sequence:
-
-Turn 1: Person describes the problem. Respond with empathy and 1-2 practical human suggestions. No lists. No headers.
-
-Turn 2: If they say they've tried that, or nothing has worked, or there's no money — THEN mention 1-2 organizations naturally, woven into conversation. Not a list. Not a referral. Just: "there's an organization called X that sometimes helps schools in situations like this — might be worth a call."
-
-Turn 3+: Only go deeper on resources if they ask or seem stuck.
-
-ORGANIZATIONS FOR SCHOOL SUPPLY / RESOURCE GAPS (use naturally, not as a dump):
-- Habitat for Humanity Charlotte — (704) 376-7710, habitatcharlotte.org — sometimes donates building materials and supplies to schools
-- Home Depot Foundation / Lowe's Community Grants — both have local giving programs for community spaces
-- Foundation For The Carolinas — fftc.org — local grants for nonprofits and community organizations
-- Dollar General Literacy Foundation — dgliteracy.org — grants for schools and community programs
-- Communities In Schools of Charlotte-Mecklenburg — wraparound support that sometimes includes supplies
-- Local faith communities — many have discretionary funds specifically for schools in their neighborhood
-- Crisis Assistance Ministry — (704) 371-3001 — has helped school staff and families in unexpected ways
-- United Way of Central Carolinas — uwcentralcarolinas.org — connects to a wide range of community resources`;
+  const SYSTEM_PROMPT = null; // Prompt lives in Netlify function
 
   const GREETINGS = [
     "Hello, how can I help?"
@@ -1675,7 +1361,6 @@ ORGANIZATIONS FOR SCHOOL SUPPLY / RESOURCE GAPS (use naturally, not as a dump):
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          system: SYSTEM_PROMPT,
           messages: apiMessages
         })
       });
@@ -1709,79 +1394,124 @@ ORGANIZATIONS FOR SCHOOL SUPPLY / RESOURCE GAPS (use naturally, not as a dump):
 </script>
 
 <!-- ════════════ TEACHERS SPACE ════════════ -->
-<div class="page" id="page-teachers">
-  <div class="teachers-wrap">
-    <button class="back-btn" onclick="navigate('home')" style="margin-bottom:20px;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      Back
-    </button>
+
+<!-- ════════════ TEACHERS SPACE FULL SCREEN ════════════ -->
+<div id="page-ts" style="display:none;">
+  <div class="ts-fullscreen">
 
     <!-- AUTH SCREEN -->
-    <div id="ts-auth">
-      <div class="auth-box">
-        <div class="auth-logo">ProphetApp AI</div>
-        <div class="auth-sub">Teachers Space — powered by CLSA.<br>Sign in with your school email to get started.</div>
-        <div class="auth-tabs">
-          <button class="auth-tab active" id="tab-signin" onclick="tsTab('signin')">Sign In</button>
-          <button class="auth-tab" id="tab-signup" onclick="tsTab('signup')">Create Account</button>
+    <div id="ts-auth-screen" class="ts-auth-wrap">
+      <div class="ts-auth-box">
+        <div class="ts-auth-logo">
+          <div class="ts-auth-logo-dot"></div>
+          <div class="ts-auth-logo-text">ProphetApp AI · Teachers Space</div>
         </div>
-        <div id="ts-signin-form">
-          <input class="auth-input" id="signin-email" type="email" placeholder="School email (e.g. name@cms.k12.nc.us)" />
-          <input class="auth-input" id="signin-pass" type="password" placeholder="Password" />
-          <button class="auth-btn" id="signin-btn" onclick="tsSignIn()">Sign In</button>
-          <div class="auth-msg" id="signin-msg"></div>
+
+        <!-- Sign In / Sign Up tabs -->
+        <div id="ts-auth-forms">
+          <h1 class="ts-auth-title">Welcome back</h1>
+          <p class="ts-auth-sub">Sign in to access your saved chats and teaching tools.</p>
+          <div class="ts-tabs">
+            <button class="ts-tab active" id="tab-signin" onclick="tsTab('signin')">Sign In</button>
+            <button class="ts-tab" id="tab-signup" onclick="tsTab('signup')">Create Account</button>
+          </div>
+
+          <!-- Sign In -->
+          <div id="ts-signin-form">
+            <div class="ts-field"><label>Email</label><input type="email" id="signin-email" placeholder="you@school.edu"></div>
+            <div class="ts-field"><label>Password</label><input type="password" id="signin-pass" placeholder="••••••••"></div>
+            <button class="ts-auth-btn" id="signin-btn" onclick="tsSignIn()">Sign In</button>
+            <div class="auth-msg" id="signin-msg"></div>
+          </div>
+
+          <!-- Sign Up -->
+          <div id="ts-signup-form" style="display:none;">
+            <div class="ts-field"><label>Your Name</label><input type="text" id="signup-name" placeholder="First Last"></div>
+            <div class="ts-field"><label>Email</label><input type="email" id="signup-email" placeholder="you@school.edu"></div>
+            <div class="ts-field"><label>Password</label><input type="password" id="signup-pass" placeholder="Min 8 characters"></div>
+            <button class="ts-auth-btn" id="signup-btn" onclick="tsSignUp()">Create Account</button>
+            <div class="auth-msg" id="signup-msg"></div>
+            <p class="auth-note">Always free for teachers and school staff.</p>
+          </div>
         </div>
-        <div id="ts-signup-form" style="display:none;">
-          <input class="auth-input" id="signup-name" type="text" placeholder="Your name" />
-          <input class="auth-input" id="signup-email" type="email" placeholder="School email (e.g. name@cms.k12.nc.us)" />
-          <input class="auth-input" id="signup-pass" type="password" placeholder="Create password (min 8 characters)" />
-          <button class="auth-btn" id="signup-btn" onclick="tsSignUp()">Create Account</button>
-          <div class="auth-msg" id="signup-msg"></div>
-          <div class="auth-note">A confirmation link will be sent to your school email.<br>You must verify before signing in.</div>
+
+        <!-- Verification screen -->
+        <div id="ts-verify-screen" style="display:none;" class="verify-box">
+          <div class="verify-icon">✉️</div>
+          <div class="verify-title">Check your email</div>
+          <div class="verify-text">We sent a confirmation link to your email address. Click the link to verify your account, then come back and sign in.</div>
+          <button class="verify-resend" onclick="tsResend()">Resend confirmation email</button>
+          <div class="auth-msg" id="verify-msg" style="margin-top:16px;"></div>
         </div>
       </div>
     </div>
 
-    <!-- VERIFICATION PENDING -->
-    <div id="ts-verify" style="display:none;">
-      <div class="verify-box">
-        <div class="verify-icon">✉️</div>
-        <div class="verify-title">Check your school email</div>
-        <div class="verify-text">We sent a confirmation link to your school email address. Click the link to verify your account, then come back and sign in.</div>
-        <button class="verify-resend" onclick="tsResend()">Resend confirmation email</button>
-        <div class="auth-msg" id="verify-msg" style="margin-top:16px;"></div>
-      </div>
-    </div>
+    <!-- DASHBOARD SCREEN -->
+    <div id="ts-dash-screen" style="display:none;">
 
-    <!-- DASHBOARD -->
-    <div id="ts-dashboard" style="display:none;">
-      <div class="ts-header">
-        <div class="ts-header-left">
-          <div class="ts-welcome" id="ts-user-name">Welcome back</div>
-          <div class="ts-sub">ProphetApp AI · Teachers Space</div>
+      <!-- Sidebar -->
+      <div class="ts-sidebar">
+        <div class="ts-sidebar-top">
+          <button class="ts-new-btn" onclick="tsNewChat()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Chat
+          </button>
+          <div class="ts-chats-label">Recent</div>
         </div>
-        <button class="ts-signout" onclick="tsSignOut()">Sign Out</button>
-      </div>
-      <div class="ts-layout">
-        <!-- Sidebar -->
-        <div class="ts-sidebar">
-          <button class="ts-new-btn" onclick="tsNewChat()">+ New Chat</button>
-          <div class="ts-chats-label">Saved Chats</div>
+        <div class="ts-chat-list-wrap">
           <div id="ts-chat-list"></div>
+        </div>
+        <div class="ts-sidebar-bottom">
+          <div class="ts-user-row">
+            <span class="ts-user-name" id="ts-user-name">—</span>
+            <button class="ts-signout" onclick="tsSignOut()">Sign out</button>
+          </div>
           <div class="ts-limit-note" id="ts-limit-note"></div>
         </div>
-        <!-- Chat Panel -->
-        <div class="ts-chat-panel">
-          <div class="ts-chat-messages" id="ts-messages"></div>
-          <div class="ts-input-bar">
-            <textarea class="ts-input" id="ts-input" placeholder="Ask anything..." rows="1"></textarea>
-            <button class="ts-send" id="ts-send-btn" onclick="tsSend()">▶</button>
+      </div>
+
+      <!-- Main chat area -->
+      <div class="ts-main">
+        <!-- Top bar -->
+        <div class="ts-topbar">
+          <div class="ts-topbar-left">
+            <button class="ts-back-btn" onclick="navigate('home')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              carolinalsa.com
+            </button>
+          </div>
+          <div class="ts-topbar-model">ProphetApp AI</div>
+        </div>
+
+        <!-- Messages -->
+        <div class="ts-messages-wrap" id="ts-messages-wrap">
+          <div class="ts-messages-inner" id="ts-messages">
+            <!-- Empty state shown before first message -->
+            <div class="ts-empty" id="ts-empty-state">
+              <div class="ts-gold-dot"></div>
+              <div class="ts-empty-title">Teachers Space</div>
+              <div class="ts-empty-sub">Your AI built for K-12. Lesson plans, support, strategy — whatever you need today.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="ts-input-area">
+          <div class="ts-input-wrap">
+            <textarea class="ts-input" id="ts-input" placeholder="Ask anything..." rows="1" onkeydown="tsSendKey(event)" oninput="tsAutoResize(this)"></textarea>
+            <div class="ts-input-footer">
+              <span class="ts-input-hint">Enter to send · Shift+Enter for new line</span>
+              <button class="ts-send" id="ts-send-btn" onclick="tsSend()">
+                <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+
+    </div><!-- end ts-dash-screen -->
+  </div><!-- end ts-fullscreen -->
+</div><!-- end page-ts -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/docx@8/build/index.js"></script>
@@ -1794,7 +1524,7 @@ const SUPABASE_URL = 'https://yzvzcjfbgefwytvyhmjw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_ofpejOZXspk1gy8xQRDA5A_5YSMo_X0';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const TS_SYSTEM_PROMPT = `You are ProphetApp AI — the most capable AI tool ever built for K-12 education, built by CLSA. You are in the Teachers Space — a verified environment for school staff. Be warm, direct, practical. Generate complete usable documents when asked. Reference NC SCOS standards with exact codes when building lesson plans.`;
+const TS_SYSTEM_PROMPT = null; // Prompt lives in Netlify function
 
 let tsUser = null;
 let tsChats = [];
@@ -1881,25 +1611,27 @@ async function tsResend() {
 
 // ─── SCREEN SWITCHES ───
 function tsShowAuth() {
-  document.getElementById('ts-auth').style.display = 'block';
-  document.getElementById('ts-verify').style.display = 'none';
-  document.getElementById('ts-dashboard').style.display = 'none';
+  document.getElementById('ts-auth-screen').style.display = 'flex';
+  document.getElementById('ts-verify-screen').style.display = 'none';
+  document.getElementById('ts-auth-forms').style.display = 'block';
+  document.getElementById('ts-dash-screen').style.display = 'none';
 }
 function tsShowVerify() {
-  document.getElementById('ts-auth').style.display = 'none';
-  document.getElementById('ts-verify').style.display = 'block';
-  document.getElementById('ts-dashboard').style.display = 'none';
+  document.getElementById('ts-auth-screen').style.display = 'flex';
+  document.getElementById('ts-auth-forms').style.display = 'none';
+  document.getElementById('ts-verify-screen').style.display = 'block';
+  document.getElementById('ts-dash-screen').style.display = 'none';
 }
-function tsShowDashboard() {
-  document.getElementById('ts-auth').style.display = 'none';
-  document.getElementById('ts-verify').style.display = 'none';
-  document.getElementById('ts-dashboard').style.display = 'block';
+async function tsShowDashboard() {
+  document.getElementById('ts-auth-screen').style.display = 'none';
+  document.getElementById('ts-verify-screen').style.display = 'none';
+  document.getElementById('ts-dash-screen').style.display = 'flex';
 }
 
 // ─── LOAD DASHBOARD ───
 async function tsLoadDashboard() {
   const name = tsUser.user_metadata?.full_name || tsUser.email.split('@')[0];
-  document.getElementById('ts-user-name').textContent = 'Welcome back, ' + name;
+  document.getElementById('ts-user-name').textContent = name;
   await tsLoadChats();
   tsShowDashboard();
   if (tsChats.length === 0) tsNewChat();
@@ -1924,7 +1656,6 @@ function tsRenderChatList() {
     item.className = 'ts-chat-item' + (tsActiveChat?.id === chat.id ? ' active' : '');
     item.innerHTML = `
       <div class="ts-chat-title">${chat.title || 'New Chat'}</div>
-      <div class="ts-chat-date">${new Date(chat.updated_at).toLocaleDateString()}</div>
       <button class="ts-chat-del" onclick="tsDeleteChat('${chat.id}',event)" title="Delete">✕</button>
     `;
     item.onclick = (e) => { if (!e.target.classList.contains('ts-chat-del')) tsOpenChat(chat); };
@@ -1950,7 +1681,7 @@ async function tsNewChat() {
 }
 
 // ─── OPEN CHAT ───
-function tsOpenChat(chat) {
+async function tsOpenChat(chat) {
   tsActiveChat = chat;
   tsMessages = chat.messages || [];
   tsRenderMessages();
@@ -1984,33 +1715,49 @@ function tsRenderMessages() {
 
 // ─── APPEND MESSAGE ───
 function tsAppendMsg(role, content, scroll = true) {
+  // Hide empty state on first message
+  const emptyState = document.getElementById('ts-empty-state');
+  if (emptyState) emptyState.style.display = 'none';
+
   const container = document.getElementById('ts-messages');
   const div = document.createElement('div');
   div.className = 'ts-msg ' + role;
+
+  const inner = document.createElement('div');
+  inner.className = 'ts-msg-content';
+
   if (role === 'ai') {
     // Render markdown-like formatting
     let html = content
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^— (.+)$/gm, '<p>— $1</p>')
-      .replace(/^(\d+\)|\d+\.) (.+)$/gm, '<p>$1 $2</p>')
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+      .replace(/^[-—] (.+)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+      .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
       .replace(/\n\n/g, '</p><p>')
       .replace(/\n/g, '<br>');
-    div.innerHTML = '<p>' + html + '</p>';
+    inner.innerHTML = '<p>' + html + '</p>';
 
-    // Add Word doc button for substantial responses
-    if (content.length > 300) {
+    // Word doc button only for substantial responses (600+ chars)
+    if (content.length > 600) {
       const docBtn = document.createElement('button');
       docBtn.className = 'ts-doc-btn';
-      docBtn.innerHTML = '📄 Create Word Document';
+      docBtn.innerHTML = '↓ Download as Word Document';
       docBtn.onclick = () => tsCreateDoc(content);
-      div.appendChild(docBtn);
+      inner.appendChild(docBtn);
     }
   } else {
-    div.textContent = content;
+    inner.textContent = content;
   }
+
+  div.appendChild(inner);
   container.appendChild(div);
   if (scroll) {
-    div.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const wrap = document.getElementById('ts-messages-wrap');
+    if (wrap) wrap.scrollTop = wrap.scrollHeight;
   }
 }
 
@@ -2030,15 +1777,17 @@ async function tsSend() {
 
   // Typing indicator
   const typing = document.createElement('div');
-  typing.className = 'ts-typing'; typing.id = 'ts-typing'; typing.textContent = 'ProphetApp AI is thinking...';
+  typing.className = 'ts-typing'; typing.id = 'ts-typing';
+  typing.innerHTML = '<div class="ts-typing-dots"><span></span><span></span><span></span></div>';
   document.getElementById('ts-messages').appendChild(typing);
-  typing.scrollIntoView({ behavior: 'smooth' });
+  const wrap = document.getElementById('ts-messages-wrap');
+  if (wrap) wrap.scrollTop = wrap.scrollHeight;
 
   try {
-    const res = await fetch('/api/chat', {
+    const res = await fetch('/.netlify/functions/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ system: TS_SYSTEM_PROMPT, messages: tsMessages })
+      body: JSON.stringify({ messages: tsMessages })
     });
     const data = await res.json();
     document.getElementById('ts-typing')?.remove();
@@ -2066,6 +1815,21 @@ async function tsSend() {
   document.getElementById('ts-send-btn').disabled = false;
   input.focus();
 }
+
+// ─── KEY HANDLER ───
+function tsSendKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    tsSend();
+  }
+}
+
+// ─── AUTO RESIZE TEXTAREA ───
+function tsAutoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+}
+
 
 // ─── WORD DOCUMENT GENERATOR ───
 async function tsCreateDoc(content) {
