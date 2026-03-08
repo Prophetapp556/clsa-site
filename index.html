@@ -1616,6 +1616,11 @@
         <div class="ts-chat-list-wrap">
           <div id="ts-chat-list"></div>
         </div>
+        <div id="ts-review-btn-wrap" style="display:none; padding:0 14px 8px;">
+          <button onclick="tsOpenReview()" style="width:100%;padding:7px 12px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:8px;color:#C9A84C;font-family:'Raleway',sans-serif;font-size:11px;font-weight:600;cursor:pointer;letter-spacing:0.04em;">
+            ✦ Review Training Queue
+          </button>
+        </div>
         <div class="ts-sidebar-bottom">
           <div>
             <div class="ts-user-name" id="ts-user-name"></div>
@@ -1812,6 +1817,7 @@ async function tsShowDashboard() {
 async function tsLoadDashboard() {
   const name = tsUser.user_metadata?.full_name || tsUser.email.split('@')[0];
   document.getElementById('ts-user-name').textContent = name;
+  tsCheckTrainerUI();
   await tsLoadChats();
   tsShowDashboard();
   if (tsChats.length === 0) tsNewChat();
@@ -1964,10 +1970,19 @@ async function tsSend() {
   if (wrap) wrap.scrollTop = wrap.scrollHeight;
 
   try {
+    // Count user turns — signal threshold is 2+ turns (4+ messages total)
+    const userTurnCount = tsMessages.filter(m => m.role === 'user').length;
+    const saveTraining = userTurnCount >= 2;
+
     const res = await fetch('/.netlify/functions/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: tsMessages })
+      body: JSON.stringify({
+        messages: tsMessages,
+        userId: tsUser?.id || null,
+        userEmail: tsUser?.email || null,
+        saveTraining
+      })
     });
     const data = await res.json();
     document.getElementById('ts-typing')?.remove();
@@ -2071,6 +2086,116 @@ async function tsCreateDoc(content) {
 // ─── HELPER ───
 function tsMsg(el, msg, type) { el.textContent = msg; el.className = 'auth-msg ' + type; }
 
+
+// ══════════════════════════════════════════
+// TRAINING SYSTEM
+// ══════════════════════════════════════════
+
+const TRAINER_EMAIL = 'Prophetapp@yahoo.com';
+
+function tsIsTrainer() {
+  return tsUser?.email?.toLowerCase() === TRAINER_EMAIL.toLowerCase();
+}
+
+// Show Review button only for trainer account
+function tsCheckTrainerUI() {
+  const wrap = document.getElementById('ts-review-btn-wrap');
+  if (wrap) wrap.style.display = tsIsTrainer() ? 'block' : 'none';
+}
+
+// ── OPEN REVIEW MODAL ──
+async function tsOpenReview() {
+  document.getElementById('ts-review-modal').style.display = 'flex';
+  await tsLoadReviewQueue();
+}
+
+function tsCloseReview() {
+  document.getElementById('ts-review-modal').style.display = 'none';
+}
+
+// ── LOAD QUEUE ──
+async function tsLoadReviewQueue() {
+  const list = document.getElementById('ts-review-list');
+  const countEl = document.getElementById('ts-review-count');
+  list.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:40px 0;">Loading...</div>';
+
+  const { data, error } = await sb.from('training_examples')
+    .select('*')
+    .order('weight', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error || !data) {
+    list.innerHTML = '<div style="color:#f87171;font-size:13px;text-align:center;padding:40px 0;">Could not load queue.</div>';
+    return;
+  }
+
+  const approved = data.filter(d => d.approved);
+  const pending = data.filter(d => !d.approved);
+  countEl.textContent = `${approved.length} approved · ${pending.length} pending review`;
+
+  if (data.length === 0) {
+    list.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:40px 0;">No training examples yet. Have conversations to build the queue.</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+
+  // Show pending first, then approved
+  [...pending, ...approved].forEach(ex => {
+    const card = document.createElement('div');
+    card.id = `review-card-${ex.id}`;
+    card.style.cssText = `margin-bottom:16px; padding:16px; background:rgba(255,255,255,0.03); border:1px solid ${ex.approved ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.08)'}; border-radius:10px;`;
+
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span style="font-size:10px;font-weight:600;letter-spacing:0.06em;color:rgba(201,168,76,0.7);background:rgba(201,168,76,0.08);padding:2px 8px;border-radius:20px;">${ex.pattern?.replace(/_/g,' ').toUpperCase()}</span>
+          <span style="font-size:10px;color:rgba(255,255,255,0.2);">weight: ${ex.weight}</span>
+          ${ex.approved ? '<span style="font-size:10px;color:#86efac;">● approved</span>' : '<span style="font-size:10px;color:rgba(255,200,0,0.6);">● pending</span>'}
+        </div>
+        <button onclick="tsDeleteExample('${ex.id}')" style="background:none;border:none;color:rgba(255,100,100,0.4);cursor:pointer;font-size:13px;padding:2px 6px;" title="Delete">✕</button>
+      </div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:4px;">EDUCATOR ASKED</div>
+        <div id="user-msg-${ex.id}" style="font-size:13px;color:#c8c4be;line-height:1.5;">${ex.user_message}</div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:4px;">PROPHETAPP RESPONDED</div>
+        <textarea id="ai-resp-${ex.id}" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#d4d0cb;font-family:'Raleway',sans-serif;font-size:12px;line-height:1.6;padding:10px;resize:vertical;min-height:80px;box-sizing:border-box;">${ex.ai_response}</textarea>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        ${!ex.approved ? `<button onclick="tsApproveExample('${ex.id}')" style="padding:5px 14px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);border-radius:6px;color:#C9A84C;font-family:'Raleway',sans-serif;font-size:11px;cursor:pointer;">Approve</button>` : ''}
+        <button onclick="tsSaveExample('${ex.id}')" style="padding:5px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:#d4d0cb;font-family:'Raleway',sans-serif;font-size:11px;cursor:pointer;">Save Edit</button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+// ── APPROVE ──
+async function tsApproveExample(id) {
+  await sb.from('training_examples').update({ approved: true }).eq('id', id);
+  await tsLoadReviewQueue();
+}
+
+// ── SAVE EDIT ──
+async function tsSaveExample(id) {
+  const newResp = document.getElementById(`ai-resp-${id}`).value.trim();
+  if (!newResp) return;
+  await sb.from('training_examples').update({ ai_response: newResp, approved: true }).eq('id', id);
+  const card = document.getElementById(`review-card-${id}`);
+  if (card) card.style.borderColor = 'rgba(134,239,172,0.3)';
+  setTimeout(() => tsLoadReviewQueue(), 800);
+}
+
+// ── DELETE ──
+async function tsDeleteExample(id) {
+  await sb.from('training_examples').delete().eq('id', id);
+  const card = document.getElementById(`review-card-${id}`);
+  if (card) card.remove();
+}
+
 // ─── INPUT AUTO-RESIZE + ENTER TO SEND ───
 document.addEventListener('DOMContentLoaded', () => {
   const input = document.getElementById('ts-input');
@@ -2086,6 +2211,27 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
+
+<!-- ── TRAINING REVIEW MODAL ── -->
+<div id="ts-review-modal" style="display:none; position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.7); align-items:center; justify-content:center;">
+  <div style="background:#1c1c1a; border:1px solid rgba(255,255,255,0.1); border-radius:16px; width:90%; max-width:720px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden;">
+    <div style="padding:20px 24px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+      <div>
+        <div style="font-size:15px; font-weight:700; color:#f0ede8;">Training Queue</div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.3); margin-top:2px;">Review, edit, approve or remove learned patterns</div>
+      </div>
+      <button onclick="tsCloseReview()" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:20px;cursor:pointer;padding:4px 8px;">✕</button>
+    </div>
+    <div id="ts-review-list" style="overflow-y:auto; padding:16px 24px; flex:1;">
+      <div style="color:rgba(255,255,255,0.3); font-size:13px; text-align:center; padding:40px 0;">Loading...</div>
+    </div>
+    <div style="padding:12px 24px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+      <div id="ts-review-count" style="font-size:11px; color:rgba(255,255,255,0.25);"></div>
+      <button onclick="tsCloseReview()" style="padding:7px 18px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#d4d0cb; font-family:'Raleway',sans-serif; font-size:12px; cursor:pointer;">Done</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
