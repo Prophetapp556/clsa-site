@@ -1688,7 +1688,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
           </div>
-          <div class="ts-input-hint">Enter to send · Shift+Enter for new line · Paste or attach images</div>
+          <div class="ts-input-hint">Enter to send · Shift+Enter for new line · Paste or attach images · <span onclick="tsUnstick()" style="cursor:pointer;color:rgba(201,168,76,0.5);text-decoration:underline;" title="Click if send button is stuck">unstick</span></div>
         </div>
       </div>
 
@@ -2083,17 +2083,25 @@ async function tsSend() {
     const userTurnCount = tsMessages.filter(m => m.role === 'user').length;
     const saveTraining = userTurnCount >= 2;
 
-    const res = await fetch('/.netlify/functions/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: tsMessages,
-        userId: tsUser?.id || null,
-        userEmail: tsUser?.email || null,
-        saveTraining
-      })
-    });
-    const data = await res.json();
+    const controller = new AbortController();
+    const fetchTimeout = setTimeout(() => controller.abort(), 25000); // 25s timeout
+    let res, data;
+    try {
+      res = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          messages: tsMessages,
+          userId: tsUser?.id || null,
+          userEmail: tsUser?.email || null,
+          saveTraining
+        })
+      });
+      data = await res.json();
+    } finally {
+      clearTimeout(fetchTimeout);
+    }
     document.getElementById('ts-typing')?.remove();
     const reply = data?.content?.[0]?.text || 'Something went wrong. Please try again.';
     tsMessages.push({ role: 'assistant', content: reply });
@@ -2107,10 +2115,17 @@ async function tsSend() {
     // Auto-title chat after first exchange
     if (tsMessages.length === 2) {
       const title = text.length > 40 ? text.substring(0, 40) + '...' : text;
-      await sb.from('chats').update({ title, messages: tsMessages, updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id);
+      // Trim stored messages — cap each message at 3000 chars to prevent Supabase payload issues
+      const trimForStorage = (msgs) => msgs.map(m => ({
+        ...m,
+        content: typeof m.content === 'string' && m.content.length > 3000
+          ? m.content.slice(0, 3000) + '...[truncated]'
+          : m.content
+      }));
+      await sb.from('chats').update({ title, messages: trimForStorage(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id);
       tsActiveChat.title = title;
     } else {
-      await sb.from('chats').update({ messages: tsMessages, updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id);
+      await sb.from('chats').update({ messages: trimForStorage(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id);
     }
     tsActiveChat.messages = tsMessages;
     tsRenderChatList();
@@ -2123,6 +2138,14 @@ async function tsSend() {
     document.getElementById('ts-send-btn').disabled = false;
     input.focus();
   }
+}
+
+// ─── UNSTICK ───
+function tsUnstick() {
+  tsLoading = false;
+  const btn = document.getElementById('ts-send-btn');
+  if (btn) btn.disabled = false;
+  document.getElementById('ts-typing')?.remove();
 }
 
 // ─── KEY HANDLER ───
