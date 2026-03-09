@@ -2115,17 +2115,20 @@ async function tsSend() {
     // Auto-title chat after first exchange
     if (tsMessages.length === 2) {
       const title = text.length > 40 ? text.substring(0, 40) + '...' : text;
-      // Trim stored messages — cap each message at 3000 chars to prevent Supabase payload issues
-      const trimForStorage = (msgs) => msgs.map(m => ({
-        ...m,
-        content: typeof m.content === 'string' && m.content.length > 3000
-          ? m.content.slice(0, 3000) + '...[truncated]'
-          : m.content
-      }));
-      await sb.from('chats').update({ title, messages: trimForStorage(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id);
+      // Trim stored messages — cap each message at 1500 chars to prevent Supabase payload issues
+      const trimForStorage = (msgs) => msgs.map(m => {
+        try {
+          if (typeof m.content === 'string' && m.content.length > 1500)
+            return { ...m, content: m.content.slice(0, 1500) + '...[truncated]' };
+          if (Array.isArray(m.content))
+            return { ...m, content: m.content.map(b => b.type === 'image' ? { type: 'text', text: '[image]' } : b) };
+          return m;
+        } catch(e) { return { ...m, content: '[content trimmed]' }; }
+      });
+      try { await sb.from('chats').update({ title, messages: trimForStorage(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id); } catch(e) { console.warn('Save failed:', e); }
       tsActiveChat.title = title;
     } else {
-      await sb.from('chats').update({ messages: trimForStorage(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id);
+      try { await sb.from('chats').update({ messages: trimForStorage(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id); } catch(e) { console.warn('Save failed:', e); }
     }
     tsActiveChat.messages = tsMessages;
     tsRenderChatList();
