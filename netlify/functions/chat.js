@@ -81,24 +81,18 @@ exports.handler = async (event) => {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'web-search-2025-03-05'
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 2048,
         system: fullPrompt,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         messages: messages
       })
     });
 
     const data = await response.json();
-    // Extract text from response — handle web search (multiple content blocks)
-    const aiReply = (data?.content || [])
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('') || '';
+    const aiReply = data?.content?.[0]?.text || '';
 
     // ── SAVE TRAINING EXAMPLE ──
     // Triggered when conversation has 2+ user turns (signal threshold)
