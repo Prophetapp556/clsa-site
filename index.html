@@ -2245,7 +2245,8 @@ async function tsLoadReviewQueue() {
     .limit(50);
 
   if (error || !data) {
-    list.innerHTML = '<div style="color:#f87171;font-size:13px;text-align:center;padding:40px 0;">Could not load queue.</div>';
+    console.error('Queue fetch error:', error);
+    list.innerHTML = `<div style="color:#f87171;font-size:13px;text-align:center;padding:40px 0;">Could not load queue: ${error?.message || 'unknown error'}</div>`;
     return;
   }
 
