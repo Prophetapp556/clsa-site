@@ -1302,10 +1302,11 @@
     <div class="page-body">
       <p>Carolina LifeStock Association · Charlotte, NC · <strong>carolinalsa.com</strong></p>
     </div>
-    <div class="contact-fields">
-      <input type="text" class="contact-field" placeholder="Your name" />
-      <input type="email" class="contact-field" placeholder="Email address" />
-      <select class="contact-field" style="cursor:pointer;">
+    <form class="contact-fields" name="contact" method="POST" data-netlify="true" onsubmit="tsContactSubmit(event)">
+      <input type="hidden" name="form-name" value="contact" />
+      <input type="text" name="name" class="contact-field" placeholder="Your name" required />
+      <input type="email" name="email" class="contact-field" placeholder="Email address" required />
+      <select name="role" class="contact-field" style="cursor:pointer;" required>
         <option value="" disabled selected>I'm reaching out as...</option>
         <option>A potential funder or donor</option>
         <option>A nonprofit partner</option>
@@ -1314,13 +1315,34 @@
         <option>Media or press</option>
         <option>Other</option>
       </select>
-      <textarea class="contact-field" placeholder="Your message"></textarea>
-      <button class="contact-submit">Send Message</button>
-    </div>
+      <textarea name="message" class="contact-field" placeholder="Your message" required></textarea>
+      <button type="submit" class="contact-submit" id="contact-submit-btn">Send Message</button>
+      <div id="contact-success" style="display:none; color:#C9A84C; font-size:14px; text-align:center; padding:8px 0;">Message sent — we'll be in touch soon.</div>
+    </form>
   </div>
 </div>
 
 <script>
+  /* ─── CONTACT FORM ─── */
+  async function tsContactSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('contact-submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    const form = e.target;
+    const data = new FormData(form);
+    try {
+      await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data).toString() });
+      btn.style.display = 'none';
+      document.getElementById('contact-success').style.display = 'block';
+      form.reset();
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Send Message';
+      alert('Something went wrong. Please try again.');
+    }
+  }
+
   /* ─── NAVIGATION ─── */
   const pages = {
     home: 'page-home',
@@ -2036,6 +2058,14 @@ async function tsSend() {
   } else {
     userContent = text;
   }
+  // Warn if input is very large
+  if (text.length > 8000) {
+    const warn = document.createElement('div');
+    warn.style.cssText = 'font-size:11px;color:rgba(201,168,76,0.7);text-align:center;padding:4px 0 8px;';
+    warn.textContent = 'Large input detected — if this times out, try breaking it into smaller sections.';
+    document.getElementById('ts-messages').appendChild(warn);
+  }
+
   tsMessages.push({ role: 'user', content: userContent });
   tsAppendMsg('user', text);
   tsClearImage();
@@ -2068,6 +2098,11 @@ async function tsSend() {
     const reply = data?.content?.[0]?.text || 'Something went wrong. Please try again.';
     tsMessages.push({ role: 'assistant', content: reply });
     tsAppendMsg('ai', reply);
+    // Force scroll to bottom after response renders
+    setTimeout(() => {
+      const wrap = document.getElementById('ts-messages-wrap');
+      if (wrap) wrap.scrollTop = wrap.scrollHeight;
+    }, 50);
 
     // Auto-title chat after first exchange
     if (tsMessages.length === 2) {
