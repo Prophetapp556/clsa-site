@@ -815,17 +815,6 @@
     .ts-msg.ai .ts-msg-content strong { color: #f0ede8; font-weight: 600; }
 
     /* ── DOC BUTTON ── */
-    .ts-doc-btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      margin-top: 14px; padding: 8px 14px;
-      background: rgba(201,168,76,0.08);
-      border: 1px solid rgba(201,168,76,0.2);
-      border-radius: 8px; color: #C9A84C;
-      font-size: 12px; font-weight: 600; font-family: 'Raleway', sans-serif;
-      cursor: pointer; transition: all 0.15s;
-      letter-spacing: 0.02em;
-    }
-    .ts-doc-btn:hover { background: rgba(201,168,76,0.14); border-color: rgba(201,168,76,0.35); }
 
     /* ── TYPING INDICATOR ── */
     .ts-typing { padding: 4px 0 20px; }
@@ -1924,6 +1913,11 @@ async function tsNewChat() {
 
 // ─── OPEN CHAT ───
 async function tsOpenChat(chat) {
+  // Always reset loading state when switching chats
+  tsLoading = false;
+  const btn = document.getElementById('ts-send-btn');
+  if (btn) btn.disabled = false;
+
   tsActiveChat = chat;
   tsMessages = chat.messages || [];
   tsRenderMessages();
@@ -1991,13 +1985,23 @@ function tsAppendMsg(role, content, scroll = true) {
       .replace(/\n/g, '<br>');
     inner.innerHTML = '<p>' + html + '</p>';
 
-    // Word doc button only for substantial responses (600+ chars)
-    if (content.length > 600) {
-      const docBtn = document.createElement('button');
-      docBtn.className = 'ts-doc-btn';
-      docBtn.innerHTML = '↓ Download as Word Document';
-      docBtn.onclick = () => tsCreateDoc(content);
-      inner.appendChild(docBtn);
+    // Right-click to save as doc — store content on the element
+    if (content.length > 200) {
+      div.dataset.aiContent = content;
+      div.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        tsShowContextMenu(e.clientX, e.clientY, content);
+      });
+      // Long-press for mobile
+      let pressTimer;
+      div.addEventListener('touchstart', (e) => {
+        pressTimer = setTimeout(() => {
+          const touch = e.touches[0];
+          tsShowContextMenu(touch.clientX, touch.clientY, content);
+        }, 600);
+      });
+      div.addEventListener('touchend', () => clearTimeout(pressTimer));
+      div.addEventListener('touchmove', () => clearTimeout(pressTimer));
     }
   } else {
     inner.textContent = content;
@@ -2102,6 +2106,42 @@ function tsAutoResize(el) {
 
 
 // ─── WORD DOCUMENT GENERATOR ───
+// ─── CONTEXT MENU ───
+let tsCtxContent = null;
+
+function tsShowContextMenu(x, y, aiContent) {
+  tsCtxContent = aiContent;
+  const menu = document.getElementById('ts-context-menu');
+  menu.style.display = 'block';
+  const menuW = 190, menuH = 90;
+  const left = Math.min(x, window.innerWidth - menuW - 10);
+  const top = Math.min(y, window.innerHeight - menuH - 10);
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
+}
+
+function tsHideContextMenu() {
+  document.getElementById('ts-context-menu').style.display = 'none';
+  tsCtxContent = null;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('ts-ctx-save-doc').onclick = () => {
+    if (tsCtxContent) tsCreateDoc(tsCtxContent);
+    tsHideContextMenu();
+  };
+  document.getElementById('ts-ctx-copy').onclick = () => {
+    if (tsCtxContent) navigator.clipboard.writeText(tsCtxContent).catch(() => {});
+    tsHideContextMenu();
+  };
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#ts-context-menu')) tsHideContextMenu();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') tsHideContextMenu();
+  });
+});
+
 async function tsCreateDoc(content) {
   try {
     const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docx;
@@ -2287,6 +2327,16 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 
+
+<!-- ── CONTEXT MENU ── -->
+<div id="ts-context-menu" style="display:none; position:fixed; z-index:500; background:#1e1e1c; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:6px; min-width:180px; box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+  <button id="ts-ctx-save-doc" style="display:block; width:100%; text-align:left; padding:9px 14px; background:none; border:none; color:#d4d0cb; font-family:'Raleway',sans-serif; font-size:13px; cursor:pointer; border-radius:6px;" onmouseenter="this.style.background='rgba(255,255,255,0.06)'" onmouseleave="this.style.background='none'">
+    ↓ Save as Word Document
+  </button>
+  <button id="ts-ctx-copy" style="display:block; width:100%; text-align:left; padding:9px 14px; background:none; border:none; color:#d4d0cb; font-family:'Raleway',sans-serif; font-size:13px; cursor:pointer; border-radius:6px;" onmouseenter="this.style.background='rgba(255,255,255,0.06)'" onmouseleave="this.style.background='none'">
+    ⎘ Copy response
+  </button>
+</div>
 
 <!-- ── TRAINING REVIEW MODAL ── -->
 <div id="ts-review-modal" style="display:none; position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.7); align-items:center; justify-content:center;">
