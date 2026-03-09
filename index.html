@@ -2126,13 +2126,17 @@ function tsHideContextMenu() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('ts-ctx-save-doc').onclick = () => {
-    if (tsCtxContent) tsCreateDoc(tsCtxContent);
+  document.getElementById('ts-ctx-save-doc').onclick = (e) => {
+    e.stopPropagation();
+    const c = tsCtxContent;
     tsHideContextMenu();
+    if (c) tsCreateDoc(c);
   };
-  document.getElementById('ts-ctx-copy').onclick = () => {
-    if (tsCtxContent) navigator.clipboard.writeText(tsCtxContent).catch(() => {});
+  document.getElementById('ts-ctx-copy').onclick = (e) => {
+    e.stopPropagation();
+    const c = tsCtxContent;
     tsHideContextMenu();
+    if (c) navigator.clipboard.writeText(c).catch(() => {});
   };
   document.addEventListener('click', (e) => {
     if (!e.target.closest('#ts-context-menu')) tsHideContextMenu();
