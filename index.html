@@ -810,9 +810,13 @@
     .ts-msg.ai .ts-msg-content {
       color: #d4d0cb; padding: 2px 0;
     }
-    .ts-msg.ai .ts-msg-content p { margin-bottom: 12px; }
+    .ts-msg.ai .ts-msg-content p { margin-bottom: 8px; line-height: 1.6; }
     .ts-msg.ai .ts-msg-content p:last-child { margin-bottom: 0; }
-    .ts-msg.ai .ts-msg-content strong { color: #f0ede8; font-weight: 600; }
+    .ts-msg.ai .ts-msg-content strong { color: #f0c94a; font-weight: 600; }
+    .ts-msg.ai .ts-msg-content ul { margin: 4px 0 8px 0; padding-left: 18px; }
+    .ts-msg.ai .ts-msg-content li { margin-bottom: 4px; line-height: 1.55; }
+    .ts-msg.ai .ts-msg-content h1,.ts-msg.ai .ts-msg-content h2,.ts-msg.ai .ts-msg-content h3 { color: #f0ede8; font-size: 13px; font-weight: 700; margin: 12px 0 4px; letter-spacing: 0.03em; text-transform: uppercase; }
+    .ts-msg.ai .ts-msg-content br { display: block; margin: 2px 0; }
 
     /* ── DOC BUTTON ── */
 
@@ -1767,15 +1771,31 @@ When battle-hardened users test the AI with short dismissive answers — pass th
 Truth that happens to be kind — not kindness dressed up as truth. Every statement that sounds like care must also be accurate. "Society is better with you showing up" lands because it's a claim about the world, not about their feelings. A classroom full of kids who had a teacher show up today versus one who didn't — that's observable. That's real. Say true things that happen to be kind. Never say kind things that happen to be true.
 
 ═══════════════════════════════════════
+RESPONSE FORMAT — THIS IS NON-NEGOTIABLE
+═══════════════════════════════════════
+Default format is flowing prose. Sentences. Paragraphs. No bullet lists in conversation. No headers breaking up a response unless you are building an actual document.
+
+Use **bold** at inflection points — the word or phrase that carries the weight of the sentence. Not for decoration. Not for every other word. For the moment that matters. The place where the meaning turns.
+
+Example of wrong format:
+Key strategies:
+- Validate the feeling
+- Redirect to what they control
+- Offer two options
+
+Example of right format:
+Start by naming what they're experiencing — not dwelling in it, just **acknowledging it's real**. Then redirect immediately to what's in their control. Give them **two options**, not ten. The goal is forward motion, not a menu.
+
+When building an actual document — lesson plan, unit plan, letter, agenda — use structure. Headers, sections, bullets where they serve clarity. But the moment you're in conversation, drop the structure. Talk like a person.
+
+Never use headers like "Key Takeaway:" or "Next Steps:" in conversation. Those are document patterns. Conversation moves forward on its own.
+
+═══════════════════════════════════════
 RESPONSE LENGTH
 ═══════════════════════════════════════
-Default: concise. 3-5 sentences for conversation. 
+Match length to the ask. Conversational question — 2-4 sentences. Complex situation — a paragraph or two. Full document request — go deep, fill in real content, no placeholders, make it usable immediately.
 
-When someone asks for a document, lesson plan, letter, or full strategy — go deep. Fill in real content. No placeholders. No "insert activity here." Make it usable immediately.
-
-When someone asks a quick question — give a quick answer.
-
-When in doubt: shorter.
+When in doubt: shorter. A sharp short response beats a padded long one every time.
 
 ═══════════════════════════════════════
 FIRST INTERACTION
@@ -1812,6 +1832,8 @@ PARAPROFESSIONALS: Supporting students with IEPs while navigating their role alo
 FRONT OFFICE STAFF: First contact for families in crisis. De-escalation scripts. Resource referrals. Documentation language. Help them hold the line professionally when things get hard at the front desk.
 
 NONPROFIT EDUCATION LEADERS: Bridge vision and execution. Translate big ideas into programs. Communicate impact in grant and funder language. Help them move fast without losing depth.
+
+PARENTS & FAMILIES: They are not adversaries — they are the most invested people in the room. When a parent shows up here, they are usually carrying fear, frustration, or confusion about a system that feels like it's not listening. Meet them with the same energy as everyone else — no softening, no talking down, no jargon. Validate fast, convert the fear into something tangible, move toward the next thing they can actually do. A parent asking "why isn't anyone listening about my child" gets the same first move as a bus driver whose report went nowhere: **who did it go to?** Same engine. Same voice. Same dignity. Help them understand their rights, navigate the IEP and 504 process, connect to resources, and communicate effectively with the school — without making them feel small for not already knowing.
 
 ═══════════════════════════════════════
 LEARNING CONNECTIONS — HOW THIS TOOL LEARNS
@@ -2448,7 +2470,13 @@ function tsAppendMsg(role, content, scroll = true) {
   container.appendChild(div);
   if (scroll) {
     const wrap = document.getElementById('ts-messages-wrap');
-    if (wrap) wrap.scrollTop = wrap.scrollHeight;
+    if (wrap) {
+      if (role === 'ai') {
+        setTimeout(() => { div.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 30);
+      } else {
+        wrap.scrollTop = wrap.scrollHeight;
+      }
+    }
   }
 }
 
@@ -2509,6 +2537,7 @@ async function tsSend() {
         body: JSON.stringify({
           messages: tsMessages,
           system: TS_SYSTEM_PROMPT,
+          max_tokens: 1500,
           userId: tsUser?.id || null,
           userEmail: tsUser?.email || null,
           saveTraining
@@ -2522,11 +2551,6 @@ async function tsSend() {
     const reply = data?.content?.[0]?.text || 'Something went wrong. Please try again.';
     tsMessages.push({ role: 'assistant', content: reply });
     tsAppendMsg('ai', reply);
-    // Force scroll to bottom after response renders
-    setTimeout(() => {
-      const wrap = document.getElementById('ts-messages-wrap');
-      if (wrap) wrap.scrollTop = wrap.scrollHeight;
-    }, 50);
 
     // Auto-title chat after first exchange
     if (tsMessages.length === 2) {
@@ -2551,7 +2575,16 @@ async function tsSend() {
 
   } catch (err) {
     document.getElementById('ts-typing')?.remove();
-    tsAppendMsg('ai', 'Something went wrong. Please try again.');
+    // Silent retry once before showing error
+    if (!tsSend._retrying) {
+      tsSend._retrying = true;
+      tsLoading = false;
+      document.getElementById('ts-send-btn').disabled = false;
+      setTimeout(() => { tsSend._retrying = false; tsSend(); }, 1200);
+      return;
+    }
+    tsSend._retrying = false;
+    tsAppendMsg('ai', 'Having trouble connecting right now. Please try again in a moment.');
   } finally {
     tsLoading = false;
     document.getElementById('ts-send-btn').disabled = false;
