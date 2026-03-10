@@ -242,16 +242,20 @@
 
     /* ─── TREE FORMAT BLOCK ─── */
     .tree-block {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.82rem;
-      line-height: 1.8;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.88rem;
+      line-height: 1.7;
       color: var(--white);
       white-space: pre;
       display: block;
-      margin: 8px 0;
+      margin: 6px 0;
       padding: 0;
       background: none;
       border: none;
+    }
+    .tree-block strong {
+      color: var(--gold-light);
+      font-weight: 600;
     }
 
     .typing-wrap { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
@@ -1476,7 +1480,8 @@
     function flushTree() {
       if (treeBuffer.length > 0) {
         const escaped = treeBuffer.join('\n')
-          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
         output.push('<div class="tree-block">' + escaped + '</div>');
         treeBuffer = [];
       }
@@ -2479,7 +2484,9 @@ function tsAppendMsg(role, content, scroll = true) {
 
     function tsFlushTree() {
       if (tsBuf.length > 0) {
-        const esc = tsBuf.join('\n').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const esc = tsBuf.join('\n')
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         tsParts.push('<div class="tree-block">' + esc + '</div>');
         tsBuf = [];
       }
