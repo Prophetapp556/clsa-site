@@ -1571,25 +1571,37 @@
         role: m.role === 'ai' ? 'assistant' : m.role,
         content: m.content
       }));
-      const res = await fetch('/.netlify/functions/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: apiMessages
-        })
-      });
+
+      const controller = new AbortController();
+      const fetchTimeout = setTimeout(() => controller.abort(), 25000);
+
       let data;
-      const rawText = await res.text();
-      try { data = JSON.parse(rawText); } catch(e) { data = {}; }
+      try {
+        const res = await fetch('/.netlify/functions/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({ messages: apiMessages })
+        });
+        const rawText = await res.text();
+        try { data = JSON.parse(rawText); } catch(e) { data = {}; }
+      } finally {
+        clearTimeout(fetchTimeout);
+      }
+
       hideTyping();
-      const reply = data?.content?.[0]?.text 
-        || data?.error?.message 
-        || "Error " + res.status + ": " + rawText.substring(0, 120);
+      const reply = data?.content?.[0]?.text
+        || "Having trouble connecting right now. Please try again in a moment.";
       messages.push({ role: 'assistant', content: reply });
       appendMessage('ai', reply);
+
     } catch (err) {
       hideTyping();
-      appendMessage('ai', "Something interrupted us. Please try again.");
+      const isTimeout = err.name === 'AbortError';
+      appendMessage('ai', isTimeout
+        ? "That took longer than expected. Please try sending again."
+        : "Having trouble connecting right now. Please try again in a moment."
+      );
     }
 
     isLoading = false;
