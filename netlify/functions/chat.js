@@ -549,23 +549,28 @@ exports.handler = async (event) => {
     const aiReply = data?.content?.[0]?.text || '';
 
     // ── SAVE TRAINING EXAMPLE ──
-    // Only save substantive exchanges (3+ user turns) to keep quality high
-    if (saveTraining && userId && messages.length >= 4 && aiReply) {
+    // Trainer conversations save from turn 1 (every exchange is signal)
+    // Regular users save after 2 user turns for quality threshold
+    const isTrainerSave = body.userEmail?.toLowerCase() === TRAINER_EMAIL.toLowerCase();
+    const saveThreshold = isTrainerSave ? 1 : 3;
+    if (saveTraining && userId && messages.length >= saveThreshold && aiReply) {
       try {
         const userTurns = messages.filter(m => m.role === 'user');
         const lastUserMsg = userTurns.slice(-1)[0]?.content || '';
         const pattern = detectPattern(lastUserMsg, aiReply);
         const weight = scoreExchange(messages);
-        const isTrainer = userEmail?.toLowerCase() === TRAINER_EMAIL.toLowerCase();
 
-        await sb.from('training_examples').insert({
+        const { error: insertError } = await sb.from('training_examples').insert({
           user_id: userId,
           pattern,
           user_message: lastUserMsg.slice(0, 1000),
           ai_response: aiReply.slice(0, 2000),
           weight,
-          approved: isTrainer  // trainer auto-approved, others queue for review
+          approved: isTrainerSave
         });
+        if (insertError) {
+          console.error('TRAINING INSERT FAILED:', JSON.stringify(insertError));
+        }
       } catch (e) {
         // Silent fail
       }
