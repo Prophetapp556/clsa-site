@@ -2758,9 +2758,8 @@ async function tsLoadReviewQueue() {
 
   const { data, error } = await sb.from('training_examples')
     .select('*')
-    .order('weight', { ascending: false })
     .order('created_at', { ascending: false })
-    .limit(50);
+    .limit(200);
 
   if (error || !data) {
     console.error('Queue fetch error:', error);
@@ -2770,7 +2769,7 @@ async function tsLoadReviewQueue() {
 
   const approved = data.filter(d => d.approved);
   const pending = data.filter(d => !d.approved);
-  countEl.textContent = `${approved.length} approved · ${pending.length} pending review`;
+  countEl.textContent = `${data.length} total · ${approved.length} approved · ${pending.length} pending review`;
 
   if (data.length === 0) {
     list.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:40px 0;">No training examples yet. Have conversations to build the queue.</div>';
@@ -2779,8 +2778,14 @@ async function tsLoadReviewQueue() {
 
   list.innerHTML = '';
 
-  // Show pending first, then approved
-  [...pending, ...approved].forEach(ex => {
+  // Show pending only — approved are done, no need to scroll through them
+  const toShow = pending.length > 0 ? pending : [];
+  if (toShow.length === 0) {
+    list.innerHTML = '<div style="color:rgba(134,239,172,0.6);font-size:13px;text-align:center;padding:40px 0;">✓ All caught up — no pending examples to review.</div>';
+    return;
+  }
+
+  toShow.forEach(ex => {
     const card = document.createElement('div');
     card.id = `review-card-${ex.id}`;
     card.style.cssText = `margin-bottom:16px; padding:16px; background:rgba(255,255,255,0.03); border:1px solid ${ex.approved ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.08)'}; border-radius:10px;`;
@@ -2814,6 +2819,8 @@ async function tsLoadReviewQueue() {
 // ── APPROVE ──
 async function tsApproveExample(id) {
   if (!tsIsTrainer()) return;
+  const card = document.getElementById(`review-card-${id}`);
+  if (card) { card.style.opacity = '0'; card.style.transition = 'opacity 0.3s'; setTimeout(() => card.remove(), 300); }
   await sb.from('training_examples').update({ approved: true }).eq('id', id);
   await tsLoadReviewQueue();
 }
@@ -2823,10 +2830,9 @@ async function tsSaveExample(id) {
   if (!tsIsTrainer()) return;
   const newResp = document.getElementById(`ai-resp-${id}`).value.trim();
   if (!newResp) return;
-  await sb.from('training_examples').update({ ai_response: newResp, approved: true }).eq('id', id);
   const card = document.getElementById(`review-card-${id}`);
-  if (card) card.style.borderColor = 'rgba(134,239,172,0.3)';
-  setTimeout(() => tsLoadReviewQueue(), 800);
+  if (card) { card.style.opacity = '0'; card.style.transition = 'opacity 0.3s'; setTimeout(() => card.remove(), 300); }
+  await sb.from('training_examples').update({ ai_response: newResp, approved: true }).eq('id', id);
 }
 
 // ── DELETE ──
