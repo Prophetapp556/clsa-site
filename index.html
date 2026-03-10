@@ -800,12 +800,14 @@
     .ts-msg.ai { display: flex; justify-content: flex-start; }
     .ts-msg-content {
       max-width: 85%; line-height: 1.65; font-size: 14px;
+      font-family: 'Raleway', sans-serif;
     }
     .ts-msg.user .ts-msg-content {
       background: rgba(255,255,255,0.07);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 16px 16px 4px 16px;
       padding: 10px 16px; color: #e8e4dc;
+      font-family: 'Raleway', sans-serif;
     }
     .ts-msg.ai .ts-msg-content {
       color: #d4d0cb; padding: 2px 0;
@@ -2744,6 +2746,12 @@ function tsCloseReview() {
 
 // ── LOAD QUEUE ──
 async function tsLoadReviewQueue() {
+  // Hard gate — trainer profile only, no exceptions
+  if (!tsIsTrainer()) {
+    console.warn('Training queue access denied.');
+    return;
+  }
+
   const list = document.getElementById('ts-review-list');
   const countEl = document.getElementById('ts-review-count');
   list.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:40px 0;">Loading...</div>';
@@ -2805,12 +2813,14 @@ async function tsLoadReviewQueue() {
 
 // ── APPROVE ──
 async function tsApproveExample(id) {
+  if (!tsIsTrainer()) return;
   await sb.from('training_examples').update({ approved: true }).eq('id', id);
   await tsLoadReviewQueue();
 }
 
 // ── SAVE EDIT ──
 async function tsSaveExample(id) {
+  if (!tsIsTrainer()) return;
   const newResp = document.getElementById(`ai-resp-${id}`).value.trim();
   if (!newResp) return;
   await sb.from('training_examples').update({ ai_response: newResp, approved: true }).eq('id', id);
@@ -2821,6 +2831,7 @@ async function tsSaveExample(id) {
 
 // ── DELETE ──
 async function tsDeleteExample(id) {
+  if (!tsIsTrainer()) return;
   await sb.from('training_examples').delete().eq('id', id);
   const card = document.getElementById(`review-card-${id}`);
   if (card) card.remove();
