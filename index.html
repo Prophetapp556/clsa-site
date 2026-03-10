@@ -240,6 +240,20 @@
       color: rgba(240,237,232,0.88);
     }
 
+    /* ─── TREE FORMAT BLOCK ─── */
+    .tree-block {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.82rem;
+      line-height: 1.8;
+      color: var(--white);
+      white-space: pre;
+      display: block;
+      margin: 8px 0;
+      padding: 0;
+      background: none;
+      border: none;
+    }
+
     .typing-wrap { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
     .typing-dots {
       display: flex; gap: 5px; padding: 11px 14px;
@@ -1454,11 +1468,37 @@
   });
 
   function renderMarkdown(text) {
-    return text
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      .replace(/\n/g, '<br>');
+    // Split into lines and group tree blocks separately
+    const lines = text.split('\n');
+    const output = [];
+    let treeBuffer = [];
+
+    function flushTree() {
+      if (treeBuffer.length > 0) {
+        const escaped = treeBuffer.join('\n')
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        output.push('<div class="tree-block">' + escaped + '</div>');
+        treeBuffer = [];
+      }
+    }
+
+    lines.forEach(line => {
+      const isTreeLine = /^[├└│─\s]/.test(line) || /[├└]──/.test(line);
+      if (isTreeLine) {
+        treeBuffer.push(line);
+      } else {
+        flushTree();
+        // Normal line — escape then apply inline markdown
+        const escaped = line
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em>$1</em>');
+        output.push(escaped ? '<span class="md-line">' + escaped + '</span>' : '<br>');
+      }
+    });
+
+    flushTree();
+    return output.join('<br>');
   }
 
   function appendMessage(role, text) {
@@ -2432,19 +2472,38 @@ function tsAppendMsg(role, content, scroll = true) {
   inner.className = 'ts-msg-content';
 
   if (role === 'ai') {
-    // Render markdown-like formatting
-    let html = content
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-      .replace(/^[-—] (.+)$/gm, '<li>$1</li>')
-      .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-      .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/\n/g, '<br>');
-    inner.innerHTML = '<p>' + html + '</p>';
+    // Render markdown-like formatting with tree block support
+    const tsLines = content.split('\n');
+    const tsParts = [];
+    let tsBuf = [];
+
+    function tsFlushTree() {
+      if (tsBuf.length > 0) {
+        const esc = tsBuf.join('\n').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        tsParts.push('<div class="tree-block">' + esc + '</div>');
+        tsBuf = [];
+      }
+    }
+
+    tsLines.forEach(line => {
+      if (/^[├└│─\s]/.test(line) || /[├└]──/.test(line)) {
+        tsBuf.push(line);
+      } else {
+        tsFlushTree();
+        const esc = line
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/^### (.+)$/, '<h3>$1</h3>')
+          .replace(/^## (.+)$/, '<h2>$1</h2>')
+          .replace(/^# (.+)$/, '<h1>$1</h1>')
+          .replace(/^[-—] (.+)$/, '<li>$1</li>')
+          .replace(/^\d+\. (.+)$/, '<li>$1</li>');
+        tsParts.push(esc || '<br>');
+      }
+    });
+    tsFlushTree();
+
+    inner.innerHTML = '<p>' + tsParts.join('<br>') + '</p>';
 
     // Right-click to save as doc — store content on the element
     if (content.length > 200) {
