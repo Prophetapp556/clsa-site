@@ -1661,6 +1661,48 @@ Keep responses warm but concise — this is a sample experience. Use flowing pro
             <input class="ts-field" id="signup-name" type="text" placeholder="Full name" />
             <input class="ts-field" id="signup-email" type="email" placeholder="Work email address" />
             <input class="ts-field" id="signup-pass" type="password" placeholder="Password (min 8 characters)" />
+            <select class="ts-field" id="signup-role" style="color:rgba(240,237,232,0.7);background:rgba(255,255,255,0.04);">
+              <option value="" disabled selected>Primary role</option>
+              <option value="Teacher">Teacher</option>
+              <option value="Principal">Principal</option>
+              <option value="Assistant Principal">Assistant Principal</option>
+              <option value="Instructional Coach">Instructional Coach</option>
+              <option value="Counselor">Counselor</option>
+              <option value="Social Worker">Social Worker</option>
+              <option value="Librarian">Librarian</option>
+              <option value="Paraprofessional">Paraprofessional</option>
+              <option value="Kitchen Staff">Kitchen Staff</option>
+              <option value="Custodian">Custodian</option>
+              <option value="Bus Driver">Bus Driver</option>
+              <option value="Front Office">Front Office</option>
+              <option value="Nonprofit Education Leader">Nonprofit Education Leader</option>
+              <option value="Other">Other</option>
+            </select>
+            <select class="ts-field" id="signup-role2" style="color:rgba(240,237,232,0.7);background:rgba(255,255,255,0.04);">
+              <option value="" selected>Also serves as (optional)</option>
+              <option value="Teacher">Teacher</option>
+              <option value="Principal">Principal</option>
+              <option value="Assistant Principal">Assistant Principal</option>
+              <option value="Instructional Coach">Instructional Coach</option>
+              <option value="Counselor">Counselor</option>
+              <option value="Social Worker">Social Worker</option>
+              <option value="Librarian">Librarian</option>
+              <option value="Paraprofessional">Paraprofessional</option>
+              <option value="Coach">Coach</option>
+              <option value="Department Head">Department Head</option>
+              <option value="Other">Other</option>
+            </select>
+            <select class="ts-field" id="signup-grade" style="color:rgba(240,237,232,0.7);background:rgba(255,255,255,0.04);">
+              <option value="" disabled selected>Grade level / scope</option>
+              <option value="Pre-K">Pre-K</option>
+              <option value="K-2">K-2</option>
+              <option value="3-5">3-5</option>
+              <option value="6-8">6-8</option>
+              <option value="9-12">9-12</option>
+              <option value="K-12">K-12</option>
+              <option value="School-Wide">School-Wide</option>
+              <option value="District-Wide">District-Wide</option>
+            </select>
             <button class="ts-auth-btn" id="signup-btn" onclick="tsSignUp()">Create Account</button>
             <div class="auth-msg" id="signup-msg"></div>
           </div>
@@ -1687,6 +1729,18 @@ Keep responses warm but concise — this is a sample experience. Use flowing pro
             <button class="ts-auth-btn" id="forgot-btn" onclick="tsSendReset()">Send Reset Link</button>
             <div class="auth-msg" id="forgot-msg"></div>
             <button onclick="tsShowAuth()" style="background:none;border:none;color:rgba(201,168,76,0.6);font-family:'Raleway',sans-serif;font-size:0.75rem;cursor:pointer;margin-top:10px;padding:0;letter-spacing:0.06em;">← Back to sign in</button>
+          </div>
+        </div>
+
+        <!-- New password (reset redirect) -->
+        <div id="ts-newpass-screen" style="display:none;">
+          <div class="ts-verify-box" style="margin:0 auto;">
+            <div class="ts-verify-icon">🔒</div>
+            <div class="ts-auth-title" style="font-size:18px;">Set new password</div>
+            <div class="ts-auth-sub">Choose a new password for your account.</div>
+            <input class="ts-field" id="newpass-input" type="password" placeholder="New password (min 8 characters)" style="margin-top:16px;" />
+            <button class="ts-auth-btn" id="newpass-btn" onclick="tsSetNewPassword()">Set New Password</button>
+            <div class="auth-msg" id="newpass-msg"></div>
           </div>
         </div>
       </div>
@@ -1736,7 +1790,9 @@ Keep responses warm but concise — this is a sample experience. Use flowing pro
             </button>
           </div>
           <div class="ts-topbar-brand">ProphetApp AI</div>
-          <div style="width:100px;"></div>
+          <div style="width:100px;display:flex;align-items:center;justify-content:flex-end;padding-right:4px;">
+            <button id="ts-creator-toggle" onclick="tsToggleCreatorMode()" title="Creator Mode" style="display:none;background:none;border:none;cursor:pointer;padding:4px 6px;opacity:0.4;transition:opacity 0.2s;font-size:14px;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity=tsCreatorMode?'1':'0.4'">⚡</button>
+          </div>
         </div>
 
         <!-- Messages -->
@@ -2255,6 +2311,7 @@ Carolina LifeStock Association (CLSA) is a Charlotte, NC nonprofit founded by a 
 carolinalsa.com`;
 
 let tsUser = null;
+let tsProfile = null; // loaded from Supabase profiles table on login
 let tsChats = [];
 let tsActiveChat = null;
 let tsMessages = [];
@@ -2312,6 +2369,15 @@ sb.auth.onAuthStateChange(async (event, session) => {
     tsUser = session.user;
     const tsEl = document.getElementById('page-ts');
     const tsIsOpen = tsEl && tsEl.style.display !== 'none';
+
+    // Password reset redirect — show new password screen
+    if (event === 'PASSWORD_RECOVERY' || window.__resetOnAuth) {
+      window.__resetOnAuth = false;
+      if (!tsIsOpen) navigate('ts');
+      tsShowNewPass();
+      return;
+    }
+
     // On INITIAL_SESSION (page refresh with active login), always go straight to ProphetApp
     // Also open if already open, or confirmation redirect flag is set
     if (event === 'INITIAL_SESSION' || tsIsOpen || window.__tsOpenOnAuth) {
@@ -2349,6 +2415,9 @@ async function tsSignUp() {
   const name = document.getElementById('signup-name').value.trim();
   const email = document.getElementById('signup-email').value.trim();
   const pass = document.getElementById('signup-pass').value;
+  const primaryRole = document.getElementById('signup-role').value;
+  const secondaryRole = document.getElementById('signup-role2').value;
+  const gradeLevel = document.getElementById('signup-grade').value;
   const msg = document.getElementById('signup-msg');
 
   if (!name || !email || !pass) { tsMsg(msg, 'Please fill in all fields.', 'error'); return; }
@@ -2357,13 +2426,29 @@ async function tsSignUp() {
   const btn = document.getElementById('signup-btn');
   btn.disabled = true; btn.textContent = 'Creating account...';
 
-  const { error } = await sb.auth.signUp({
+  const { data: authData, error } = await sb.auth.signUp({
     email, password: pass,
     options: { data: { full_name: name }, emailRedirectTo: window.location.origin + window.location.pathname }
   });
 
   btn.disabled = false; btn.textContent = 'Create Account';
   if (error) { tsMsg(msg, error.message, 'error'); return; }
+
+  // Save role info to profiles table if user was created
+  if (authData?.user?.id) {
+    try {
+      await sb.from('profiles').upsert({
+        id: authData.user.id,
+        email,
+        full_name: name,
+        primary_role: primaryRole || null,
+        secondary_role: secondaryRole || null,
+        grade_level: gradeLevel || null,
+        updated_at: new Date().toISOString()
+      });
+    } catch(e) { /* silent — profile saves on trigger too */ }
+  }
+
   tsPendingEmail = email;
   tsShowVerify();
 }
@@ -2419,12 +2504,38 @@ async function tsSendReset() {
 
 // ─── HANDLE PASSWORD RESET REDIRECT ───
 (function() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('reset') === 'true' && window.location.hash.includes('access_token')) {
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token') && hash.includes('type=recovery')) {
     window.__resetOnAuth = true;
     history.replaceState(null, '', window.location.pathname);
   }
 })();
+
+// ─── SET NEW PASSWORD (after reset redirect) ───
+function tsShowNewPass() {
+  document.getElementById('ts-auth-screen').style.display = 'flex';
+  document.getElementById('ts-auth-forms').style.display = 'none';
+  document.getElementById('ts-verify-screen').style.display = 'none';
+  document.getElementById('ts-forgot-screen').style.display = 'none';
+  document.getElementById('ts-newpass-screen').style.display = 'block';
+  document.getElementById('ts-dash-screen').style.display = 'none';
+}
+
+async function tsSetNewPassword() {
+  const pass = document.getElementById('newpass-input').value;
+  const msg = document.getElementById('newpass-msg');
+  if (!pass || pass.length < 8) { tsMsg(msg, 'Password must be at least 8 characters.', 'error'); return; }
+
+  const btn = document.getElementById('newpass-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  const { error } = await sb.auth.updateUser({ password: pass });
+  btn.disabled = false; btn.textContent = 'Set New Password';
+
+  if (error) { tsMsg(msg, error.message, 'error'); return; }
+  tsMsg(msg, 'Password updated. Signing you in...', 'success');
+  setTimeout(() => navigate('ts'), 1500);
+}
 
 // ─── SIGN OUT ───
 async function tsSignOut() {
@@ -2454,6 +2565,7 @@ function tsShowVerify() {
   document.getElementById('ts-auth-screen').style.display = 'flex';
   document.getElementById('ts-auth-forms').style.display = 'none';
   document.getElementById('ts-verify-screen').style.display = 'block';
+  document.getElementById('ts-forgot-screen').style.display = 'none';
   document.getElementById('ts-dash-screen').style.display = 'none';
 }
 async function tsShowDashboard() {
@@ -2466,7 +2578,17 @@ async function tsShowDashboard() {
 async function tsLoadDashboard() {
   const name = tsUser.user_metadata?.full_name || tsUser.email.split('@')[0];
   document.getElementById('ts-user-name').textContent = name;
+
+  // Load profile from Supabase
+  try {
+    const { data } = await sb.from('profiles').select('*').eq('id', tsUser.id).single();
+    tsProfile = data || null;
+  } catch(e) {
+    tsProfile = null;
+  }
+
   tsCheckTrainerUI();
+  tsCheckCreatorUI();
   await tsLoadChats();
   tsShowDashboard();
   if (tsChats.length === 0) tsNewChat();
@@ -2720,7 +2842,9 @@ async function tsSend() {
         signal: controller.signal,
         body: JSON.stringify({
           messages: tsMessages,
-          system: TS_SYSTEM_PROMPT,
+          system: TS_SYSTEM_PROMPT
+            + (tsProfile ? `\n\n═══════════════════════════════════════\nABOUT THIS EDUCATOR\n═══════════════════════════════════════\nName: ${tsProfile.full_name || 'Unknown'}\nPrimary Role: ${tsProfile.primary_role || 'Not specified'}\nSecondary Role: ${tsProfile.secondary_role || 'None'}\nGrade Level: ${tsProfile.grade_level || 'Not specified'}\nSchool: ${tsProfile.school_name || 'Not specified'}\nSchool Type: ${tsProfile.school_type || 'Not specified'}\n\nUse this to personalize every response. Never ask them to repeat information already known here.` : '')
+            + (tsCreatorMode ? `\n\n═══════════════════════════════════════\nCREATOR MODE\n═══════════════════════════════════════\nYou are speaking with Omar, the creator of ProphetApp. He built this tool and knows the system prompt. He is simultaneously a user, evaluator, and trainer. When he tests edge cases or pushes back on responses, he may be stress-testing the system. Be transparent in ways you wouldn't be with a regular user. If he asks why you responded a certain way, tell him. If he asks what you're uncertain about, say so. Treat this as a collaborative working session. Flag anything that feels off, inconsistent, or like it could be improved.` : ''),
           max_tokens: 1500,
           userId: tsUser?.id || null,
           userEmail: tsUser?.email || null,
@@ -2906,6 +3030,23 @@ function tsMsg(el, msg, type) { el.textContent = msg; el.className = 'auth-msg '
 // ══════════════════════════════════════════
 
 const TRAINER_EMAIL = 'Prophetapp@yahoo.com';
+
+let tsCreatorMode = false;
+
+// ─── CREATOR UI ───
+function tsCheckCreatorUI() {
+  const toggle = document.getElementById('ts-creator-toggle');
+  if (toggle) toggle.style.display = tsProfile?.permission_level === 'creator' ? 'block' : 'none';
+}
+
+function tsToggleCreatorMode() {
+  tsCreatorMode = !tsCreatorMode;
+  const toggle = document.getElementById('ts-creator-toggle');
+  if (toggle) {
+    toggle.style.opacity = tsCreatorMode ? '1' : '0.4';
+    toggle.title = tsCreatorMode ? 'Creator Mode ON — click to switch to Educator Mode' : 'Creator Mode OFF — click to activate';
+  }
+}
 
 function tsIsTrainer() {
   return tsUser?.email?.toLowerCase() === TRAINER_EMAIL.toLowerCase();
