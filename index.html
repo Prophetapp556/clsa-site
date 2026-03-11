@@ -1449,6 +1449,13 @@
 
   const SYSTEM_PROMPT = null; // Prompt lives in Netlify function
 
+  // Strict public-facing prompt — homepage sample chat is K-12 only, no off-topic
+  const HOME_SYSTEM_PROMPT = `You are ProphetApp AI — a K-12 education assistant created by the Carolina LifeStock Association (CLSA) in Charlotte, NC. This is a public sample of the tool. You help teachers, school staff, administrators, and families navigate K-12 education challenges.
+
+You are strictly focused on K-12 education topics only. If someone asks about anything unrelated to education, school life, students, or the people who work in schools, politely redirect them: acknowledge their message briefly, then explain that this tool is built specifically for K-12 education and ask what's on their mind educationally.
+
+Keep responses warm but concise — this is a sample experience. Use flowing prose, no bullet lists in conversation. Be direct and practical. Never say "Great question!" or use filler phrases. Just help.`;
+
   const GREETINGS = [
     "Hello, how can I help?"
   ];
@@ -1581,7 +1588,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           signal: controller.signal,
-          body: JSON.stringify({ messages: apiMessages })
+          body: JSON.stringify({ messages: apiMessages, system: HOME_SYSTEM_PROMPT })
         });
         const rawText = await res.text();
         try { data = JSON.parse(rawText); } catch(e) { data = {}; }
@@ -1855,6 +1862,19 @@ RESPONSE LENGTH
 Match length to the ask. Conversational question — 2-4 sentences. Complex situation — a paragraph or two. Full document request — go deep, fill in real content, no placeholders, make it usable immediately.
 
 When in doubt: shorter. A sharp short response beats a padded long one every time.
+
+═══════════════════════════════════════
+WHEN A USER GOES OFF-TOPIC
+═══════════════════════════════════════
+Educators are whole people. They don't stop being human when they open this tool. If someone brings up a TV show, a hobby, a sports team, a personal story — don't shut them down. Engage for one beat. Be curious. Be real. Then, only if it makes sense naturally, bridge back to their work. Never make them feel like they used the wrong app.
+
+The rule: one genuine human response, then let them lead. If they want to keep talking about the show — fine. If they naturally move toward work — great. You are not a gatekeeper. You are a trusted presence.
+
+Example — user says "I want to talk about a TV show I love":
+Wrong: "That's not really what I'm built for. I'm designed specifically for K-12 education."
+Right: "What show? I'm curious what's got you. Sometimes what we love watching says something about what we need — or maybe you just need a minute to think about something other than school. Either way, I'm here."
+
+Never tell someone what you're "not built for." You are built for the people in school buildings — and those people have lives.
 
 ═══════════════════════════════════════
 FIRST INTERACTION
@@ -2263,10 +2283,11 @@ sb.auth.onAuthStateChange(async (event, session) => {
     tsUser = session.user;
     const tsEl = document.getElementById('page-ts');
     const tsIsOpen = tsEl && tsEl.style.display !== 'none';
-    // Only auto-open TS if: confirmation redirect hash was in URL, OR TS is already open
-    if (tsIsOpen || window.__tsOpenOnAuth) {
+    // On INITIAL_SESSION (page refresh with active login), always go straight to ProphetApp
+    // Also open if already open, or confirmation redirect flag is set
+    if (event === 'INITIAL_SESSION' || tsIsOpen || window.__tsOpenOnAuth) {
       window.__tsOpenOnAuth = false;
-      if (!tsIsOpen) navigate('ts');
+      navigate('ts'); // always call — safe to call even if already open
       await tsLoadDashboard();
     }
   } else {
@@ -2391,7 +2412,11 @@ async function tsLoadDashboard() {
 async function tsLoadChats() {
   const { data } = await sb.from('chats').select('*')
     .eq('user_id', tsUser.id).order('updated_at', { ascending: false }).limit(5);
-  tsChats = data || [];
+  tsChats = (data || []).map(chat => {
+    // Guard against corrupted or oversized message payloads loading as null
+    if (!Array.isArray(chat.messages)) chat.messages = [];
+    return chat;
+  });
   tsRenderChatList();
 }
 
@@ -2593,6 +2618,20 @@ async function tsSend() {
   tsAppendMsg('user', text);
   tsClearImage();
 
+  // Save user message immediately so refresh never loses it (Bug fix: was only saved after AI reply)
+  if (tsActiveChat) {
+    const trimImmediate = (msgs) => msgs.map(m => {
+      try {
+        if (typeof m.content === 'string' && m.content.length > 1500)
+          return { ...m, content: m.content.slice(0, 1500) + '...[truncated]' };
+        if (Array.isArray(m.content))
+          return { ...m, content: m.content.map(b => b.type === 'image' ? { type: 'text', text: '[image]' } : b) };
+        return m;
+      } catch(e) { return { ...m, content: '[content trimmed]' }; }
+    });
+    try { await sb.from('chats').update({ messages: trimImmediate(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id); } catch(e) { /* silent */ }
+  }
+
   // Typing indicator
   const typing = document.createElement('div');
   typing.className = 'ts-typing'; typing.id = 'ts-typing';
@@ -2632,19 +2671,20 @@ async function tsSend() {
     tsMessages.push({ role: 'assistant', content: reply });
     tsAppendMsg('ai', reply);
 
+    // Trim stored messages — defined here so available in both branches below (Bug fix: was scoped inside if block)
+    const trimForStorage = (msgs) => msgs.map(m => {
+      try {
+        if (typeof m.content === 'string' && m.content.length > 1500)
+          return { ...m, content: m.content.slice(0, 1500) + '...[truncated]' };
+        if (Array.isArray(m.content))
+          return { ...m, content: m.content.map(b => b.type === 'image' ? { type: 'text', text: '[image]' } : b) };
+        return m;
+      } catch(e) { return { ...m, content: '[content trimmed]' }; }
+    });
+
     // Auto-title chat after first exchange
     if (tsMessages.length === 2) {
       const title = text.length > 40 ? text.substring(0, 40) + '...' : text;
-      // Trim stored messages — cap each message at 1500 chars to prevent Supabase payload issues
-      const trimForStorage = (msgs) => msgs.map(m => {
-        try {
-          if (typeof m.content === 'string' && m.content.length > 1500)
-            return { ...m, content: m.content.slice(0, 1500) + '...[truncated]' };
-          if (Array.isArray(m.content))
-            return { ...m, content: m.content.map(b => b.type === 'image' ? { type: 'text', text: '[image]' } : b) };
-          return m;
-        } catch(e) { return { ...m, content: '[content trimmed]' }; }
-      });
       try { await sb.from('chats').update({ title, messages: trimForStorage(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id); } catch(e) { console.warn('Save failed:', e); }
       tsActiveChat.title = title;
     } else {
