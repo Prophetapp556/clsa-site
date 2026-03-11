@@ -1654,6 +1654,7 @@ Keep responses warm but concise — this is a sample experience. Use flowing pro
             <input class="ts-field" id="signin-pass" type="password" placeholder="Password" />
             <button class="ts-auth-btn" id="signin-btn" onclick="tsSignIn()">Sign In</button>
             <div class="auth-msg" id="signin-msg"></div>
+            <button onclick="tsShowForgot()" style="background:none;border:none;color:rgba(201,168,76,0.6);font-family:'Raleway',sans-serif;font-size:0.75rem;cursor:pointer;margin-top:10px;padding:0;letter-spacing:0.06em;">Forgot password?</button>
           </div>
           <!-- Sign Up -->
           <div id="ts-signup-form" style="display:none;">
@@ -1673,6 +1674,19 @@ Keep responses warm but concise — this is a sample experience. Use flowing pro
             <div class="ts-auth-sub">We sent a confirmation link. Click it to activate your account.</div>
             <button class="ts-resend-btn" onclick="tsResend()">Resend confirmation email</button>
             <div class="auth-msg" id="verify-msg"></div>
+          </div>
+        </div>
+
+        <!-- Forgot password -->
+        <div id="ts-forgot-screen" style="display:none;">
+          <div class="ts-verify-box" style="margin:0 auto;">
+            <div class="ts-verify-icon">🔑</div>
+            <div class="ts-auth-title" style="font-size:18px;">Reset your password</div>
+            <div class="ts-auth-sub">Enter your email and we'll send you a reset link.</div>
+            <input class="ts-field" id="forgot-email" type="email" placeholder="Email address" style="margin-top:16px;" />
+            <button class="ts-auth-btn" id="forgot-btn" onclick="tsSendReset()">Send Reset Link</button>
+            <div class="auth-msg" id="forgot-msg"></div>
+            <button onclick="tsShowAuth()" style="background:none;border:none;color:rgba(201,168,76,0.6);font-family:'Raleway',sans-serif;font-size:0.75rem;cursor:pointer;margin-top:10px;padding:0;letter-spacing:0.06em;">← Back to sign in</button>
           </div>
         </div>
       </div>
@@ -2377,6 +2391,41 @@ async function tsSignIn() {
   }
 }
 
+// ─── FORGOT PASSWORD ───
+function tsShowForgot() {
+  document.getElementById('ts-auth-screen').style.display = 'flex';
+  document.getElementById('ts-auth-forms').style.display = 'none';
+  document.getElementById('ts-verify-screen').style.display = 'none';
+  document.getElementById('ts-forgot-screen').style.display = 'block';
+  document.getElementById('ts-dash-screen').style.display = 'none';
+}
+
+async function tsSendReset() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const msg = document.getElementById('forgot-msg');
+  if (!email) { tsMsg(msg, 'Please enter your email address.', 'error'); return; }
+
+  const btn = document.getElementById('forgot-btn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname + '?reset=true'
+  });
+
+  btn.disabled = false; btn.textContent = 'Send Reset Link';
+  if (error) { tsMsg(msg, error.message, 'error'); return; }
+  tsMsg(msg, 'Reset link sent — check your email.', 'success');
+}
+
+// ─── HANDLE PASSWORD RESET REDIRECT ───
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('reset') === 'true' && window.location.hash.includes('access_token')) {
+    window.__resetOnAuth = true;
+    history.replaceState(null, '', window.location.pathname);
+  }
+})();
+
 // ─── SIGN OUT ───
 async function tsSignOut() {
   await sb.auth.signOut();
@@ -2398,6 +2447,7 @@ function tsShowAuth() {
   document.getElementById('ts-auth-screen').style.display = 'flex';
   document.getElementById('ts-verify-screen').style.display = 'none';
   document.getElementById('ts-auth-forms').style.display = 'block';
+  document.getElementById('ts-forgot-screen').style.display = 'none';
   document.getElementById('ts-dash-screen').style.display = 'none';
 }
 function tsShowVerify() {
