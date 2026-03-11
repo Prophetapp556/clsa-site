@@ -2772,6 +2772,114 @@ function tsAppendMsg(role, content, scroll = true) {
   }
 }
 
+// ─── STREAM MESSAGE (simulated — word by word delivery) ───
+function tsStreamMsg(fullText, onComplete) {
+  // Hide empty state
+  const emptyState = document.getElementById('ts-empty-state');
+  if (emptyState) emptyState.style.display = 'none';
+
+  const container = document.getElementById('ts-messages');
+  const div = document.createElement('div');
+  div.className = 'ts-msg ai';
+
+  const inner = document.createElement('div');
+  inner.className = 'ts-msg-content';
+  inner.innerHTML = '<p></p>';
+
+  div.appendChild(inner);
+  container.appendChild(div);
+
+  // Scroll to message start
+  const wrap = document.getElementById('ts-messages-wrap');
+  setTimeout(() => { div.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 30);
+
+  // Split into words — preserve spacing
+  const words = fullText.split(/(\s+)/);
+  let index = 0;
+  let displayed = '';
+
+  // Pacing: varies slightly like natural typing — faster for short words, tiny pauses at punctuation
+  function getDelay(word) {
+    if (/[.!?]$/.test(word)) return 55;   // pause at sentence end
+    if (/[,;:]$/.test(word)) return 35;   // slight pause at clause break
+    if (word.length <= 2) return 18;       // short words flow fast
+    return 22;                             // default word pace
+  }
+
+  function typeNext() {
+    if (index >= words.length) {
+      // All words delivered — now do full markdown render
+      tsRenderStreamedContent(inner, fullText);
+      // Wire up right-click / long-press now that full content is rendered
+      if (fullText.length > 200) {
+        div.dataset.aiContent = fullText;
+        div.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          tsShowContextMenu(e.clientX, e.clientY, fullText);
+        });
+        let pressTimer;
+        div.addEventListener('touchstart', (e) => {
+          pressTimer = setTimeout(() => {
+            const touch = e.touches[0];
+            tsShowContextMenu(touch.clientX, touch.clientY, fullText);
+          }, 600);
+        });
+        div.addEventListener('touchend', () => clearTimeout(pressTimer));
+        div.addEventListener('touchmove', () => clearTimeout(pressTimer));
+      }
+      if (onComplete) onComplete();
+      return;
+    }
+
+    const word = words[index];
+    displayed += word;
+    // Plain text preview while streaming — markdown renders at the end
+    inner.querySelector('p').textContent = displayed;
+    // Keep scrolling as content grows
+    if (wrap) wrap.scrollTop = wrap.scrollHeight;
+    index++;
+    setTimeout(typeNext, /^\s+$/.test(word) ? 0 : getDelay(word));
+  }
+
+  typeNext();
+}
+
+// ─── RENDER FINAL MARKDOWN after streaming completes ───
+function tsRenderStreamedContent(inner, content) {
+  const tsLines = content.split('\n');
+  const tsParts = [];
+  let tsBuf = [];
+
+  function tsFlushTree() {
+    if (tsBuf.length > 0) {
+      const esc = tsBuf.join('\n')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      tsParts.push('<div class="tree-block">' + esc + '</div>');
+      tsBuf = [];
+    }
+  }
+
+  tsLines.forEach(line => {
+    if (/^[├└│─\s]/.test(line) || /[├└]──/.test(line)) {
+      tsBuf.push(line);
+    } else {
+      tsFlushTree();
+      const esc = line
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^### (.+)$/, '<h3>$1</h3>')
+        .replace(/^## (.+)$/, '<h2>$1</h2>')
+        .replace(/^# (.+)$/, '<h1>$1</h1>')
+        .replace(/^[-—] (.+)$/, '<li>$1</li>')
+        .replace(/^\d+\. (.+)$/, '<li>$1</li>');
+      tsParts.push(esc || '<br>');
+    }
+  });
+  tsFlushTree();
+  inner.innerHTML = '<p>' + tsParts.join('<br>') + '</p>';
+}
+
 // ─── SEND MESSAGE ───
 async function tsSend() {
   const input = document.getElementById('ts-input');
@@ -2858,9 +2966,8 @@ async function tsSend() {
     document.getElementById('ts-typing')?.remove();
     const reply = data?.content?.[0]?.text || 'Something went wrong. Please try again.';
     tsMessages.push({ role: 'assistant', content: reply });
-    tsAppendMsg('ai', reply);
 
-    // Trim stored messages — defined here so available in both branches below (Bug fix: was scoped inside if block)
+    // Trim stored messages — available for save after streaming
     const trimForStorage = (msgs) => msgs.map(m => {
       try {
         if (typeof m.content === 'string' && m.content.length > 1500)
@@ -2871,16 +2978,18 @@ async function tsSend() {
       } catch(e) { return { ...m, content: '[content trimmed]' }; }
     });
 
-    // Auto-title chat after first exchange
-    if (tsMessages.length === 2) {
-      const title = text.length > 40 ? text.substring(0, 40) + '...' : text;
-      try { await sb.from('chats').update({ title, messages: trimForStorage(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id); } catch(e) { console.warn('Save failed:', e); }
-      tsActiveChat.title = title;
-    } else {
-      try { await sb.from('chats').update({ messages: trimForStorage(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id); } catch(e) { console.warn('Save failed:', e); }
-    }
-    tsActiveChat.messages = tsMessages;
-    tsRenderChatList();
+    // Stream the reply — save to Supabase after streaming completes
+    tsStreamMsg(reply, async () => {
+      if (tsMessages.length === 2) {
+        const title = text.length > 40 ? text.substring(0, 40) + '...' : text;
+        try { await sb.from('chats').update({ title, messages: trimForStorage(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id); } catch(e) { console.warn('Save failed:', e); }
+        tsActiveChat.title = title;
+      } else {
+        try { await sb.from('chats').update({ messages: trimForStorage(tsMessages), updated_at: new Date().toISOString() }).eq('id', tsActiveChat.id); } catch(e) { console.warn('Save failed:', e); }
+      }
+      tsActiveChat.messages = tsMessages;
+      tsRenderChatList();
+    });
 
   } catch (err) {
     document.getElementById('ts-typing')?.remove();
