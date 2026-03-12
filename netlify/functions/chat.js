@@ -468,11 +468,8 @@ Carolina LifeStock Association (CLSA) is a Charlotte, NC nonprofit founded by a 
 carolinalsa.com`;
 
 // ── PATTERN DETECTION ──
-// Expanded: 14 patterns covering every major entry point
 function detectPattern(userMsg, aiMsg) {
   const text = (userMsg + ' ' + aiMsg).toLowerCase();
-
-  // High-signal patterns first
   if (/burnout|overwhelm|exhausted|can't do this|too much|don't want to|giving up|leaving teaching|quit/.test(text)) return 'carrying_weight';
   if (/abuse|neglect|report|dss|mandated|something wrong at home|bruise|hungry|homeless/.test(text)) return 'mandatory_reporting';
   if (/iep|504|special ed|disability|accommodation|modification|placement|evaluation|sped/.test(text)) return 'special_education';
@@ -490,7 +487,6 @@ function detectPattern(userMsg, aiMsg) {
 }
 
 // ── SCORE EXCHANGE ──
-// Weight 1-3 based on conversation depth and engagement signal
 function scoreExchange(messages) {
   const userTurns = messages.filter(m => m.role === 'user').length;
   const avgLength = messages.reduce((sum, m) => sum + (m.content?.length || 0), 0) / Math.max(messages.length, 1);
@@ -509,12 +505,21 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
     const { messages, userId, userEmail, saveTraining } = body;
-    
-    // Accept system prompt addition from frontend (V6.2+), always append — never replace core prompt
+
+    // ── DOC MODE: use override prompt only, skip ProphetApp system prompt and training ──
+    const isDocMode = body.docMode === true;
     const systemPromptOverride = body.system;
-    const activePrompt = (systemPromptOverride && systemPromptOverride.length > 500)
-      ? SYSTEM_PROMPT + '\n\n' + systemPromptOverride
-      : SYSTEM_PROMPT;
+
+    let activePrompt;
+    if (isDocMode && systemPromptOverride) {
+      // Doc generation — use the lean doc writer prompt only, no ProphetApp overhead
+      activePrompt = systemPromptOverride;
+    } else {
+      // Normal chat — append any override to the full ProphetApp prompt
+      activePrompt = (systemPromptOverride && systemPromptOverride.length > 500)
+        ? SYSTEM_PROMPT + '\n\n' + systemPromptOverride
+        : SYSTEM_PROMPT;
+    }
 
     // Accept max_tokens from frontend, cap at 2048, default to 1500
     const requestedTokens = parseInt(body.max_tokens) || 1500;
@@ -522,40 +527,39 @@ exports.handler = async (event) => {
 
     const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-    // ── PULL LEARNED EXAMPLES ──
+    // ── PULL LEARNED EXAMPLES (skip for doc mode — irrelevant and wastes tokens) ──
     let learnedContext = '';
-    try {
-      const { data: examples } = await sb
-        .from('training_examples')
-        .select('pattern, user_message, ai_response, weight')
-        .eq('approved', true)
-        .order('weight', { ascending: false })
-        .limit(8);
+    if (!isDocMode) {
+      try {
+        const { data: examples } = await sb
+          .from('training_examples')
+          .select('pattern, user_message, ai_response, weight')
+          .eq('approved', true)
+          .order('weight', { ascending: false })
+          .limit(8);
 
-      if (examples && examples.length > 0) {
-        const lastUserMsg = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
-        const currentPattern = detectPattern(lastUserMsg, '');
+        if (examples && examples.length > 0) {
+          const lastUserMsg = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
+          const currentPattern = detectPattern(lastUserMsg, '');
+          const matched = examples.filter(e => e.pattern === currentPattern);
+          const others = examples.filter(e => e.pattern !== currentPattern);
+          const selected = [...matched.slice(0, 3), ...others.slice(0, 2)].slice(0, 4);
 
-        // Pattern-matched examples first, then highest weight
-        const matched = examples.filter(e => e.pattern === currentPattern);
-        const others = examples.filter(e => e.pattern !== currentPattern);
-        const selected = [...matched.slice(0, 3), ...others.slice(0, 2)].slice(0, 4);
-
-        if (selected.length > 0) {
-          learnedContext = '\n\n════════════════════════════════════════\nLEARNED FROM EDUCATORS\n════════════════════════════════════════\nThe following exchanges represent patterns learned from real educator conversations. Use these to inform your tone, depth, and approach — especially the underlying human dynamics.\n\n';
-          selected.forEach((ex, i) => {
-            learnedContext += `Example ${i + 1} [${ex.pattern}]:\nEducator: ${ex.user_message}\nProphetApp: ${ex.ai_response}\n\n`;
-          });
+          if (selected.length > 0) {
+            learnedContext = '\n\n════════════════════════════════════════\nLEARNED FROM EDUCATORS\n════════════════════════════════════════\nThe following exchanges represent patterns learned from real educator conversations. Use these to inform your tone, depth, and approach — especially the underlying human dynamics.\n\n';
+            selected.forEach((ex, i) => {
+              learnedContext += `Example ${i + 1} [${ex.pattern}]:\nEducator: ${ex.user_message}\nProphetApp: ${ex.ai_response}\n\n`;
+            });
+          }
         }
+      } catch (e) {
+        // Silent fail
       }
-    } catch (e) {
-      // Silent fail — never block on training errors
     }
 
     const fullPrompt = activePrompt + learnedContext;
 
     // ── MAIN API CALL ──
-    // Last 14 messages for context — enough for continuity without blowing context
     const trimmedMessages = messages.slice(-14);
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -576,9 +580,8 @@ exports.handler = async (event) => {
     const data = await response.json();
     const aiReply = data?.content?.[0]?.text || '';
 
-    // ── SAVE TRAINING EXAMPLE ──
-    // Only save substantive exchanges (3+ user turns) to keep quality high
-    if (saveTraining && userId && messages.length >= 4 && aiReply) {
+    // ── SAVE TRAINING EXAMPLE (skip for doc mode) ──
+    if (!isDocMode && saveTraining && userId && messages.length >= 4 && aiReply) {
       try {
         const userTurns = messages.filter(m => m.role === 'user');
         const lastUserMsg = userTurns.slice(-1)[0]?.content || '';
@@ -592,7 +595,7 @@ exports.handler = async (event) => {
           user_message: lastUserMsg.slice(0, 1000),
           ai_response: aiReply.slice(0, 2000),
           weight,
-          approved: isTrainer  // trainer auto-approved, others queue for review
+          approved: isTrainer
         });
       } catch (e) {
         // Silent fail
