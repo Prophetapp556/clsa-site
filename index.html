@@ -129,7 +129,7 @@
     }
     .drawer-overlay.open {
       opacity: 1;
-      pointer-events: all;
+      pointer-events: auto;
     }
 
     /* ─── PAGES ─── */
@@ -322,7 +322,7 @@
       width: 100%;
       position: relative;
       z-index: 10;
-      pointer-events: all;
+      pointer-events: auto;
       -webkit-user-select: text;
       user-select: text;
       touch-action: manipulation;
@@ -657,8 +657,6 @@
       .back-btn { margin-bottom: 36px; }
       .menu-btn { top: 18px; right: 18px; }
     }
-
-    
 
     /* ── TEACHERS SPACE — FULL SCREEN OVERLAY ── */
     #page-ts {
@@ -1386,6 +1384,16 @@
     const menuBtnRestore = document.getElementById('menuBtn');
     if (menuBtnRestore) menuBtnRestore.style.display = '';
 
+    // Reset contact form button if navigating away from contact
+    const contactBtn = document.getElementById('contact-submit-btn');
+    const contactSuccess = document.getElementById('contact-success');
+    if (contactBtn && key !== 'contact') {
+      contactBtn.style.display = '';
+      contactBtn.disabled = false;
+      contactBtn.textContent = 'Send Message';
+      if (contactSuccess) contactSuccess.style.display = 'none';
+    }
+
     if (key === 'ts') {
       // Show Teachers Space full screen overlay
       Object.values(pages).forEach(id => {
@@ -1443,11 +1451,6 @@
   });
 
   drawerOverlay.addEventListener('click', closeMenu);
-
-  /* ─── PROPHETAPP AI CHAT ─── */
-  
-
-  const SYSTEM_PROMPT = null; // Prompt lives in Netlify function
 
   // Strict public-facing prompt — homepage sample chat is K-12 only, no off-topic
   const HOME_SYSTEM_PROMPT = `You are ProphetApp AI — a K-12 education assistant created by the Carolina LifeStock Association (CLSA) in Charlotte, NC. This is a public sample of the tool. You help teachers, school staff, administrators, and families navigate K-12 education challenges.
@@ -1595,7 +1598,7 @@ Keep responses warm but concise — this is a sample experience. Use flowing pro
       hideTyping();
       const reply = data?.content?.[0]?.text
         || "Having trouble connecting right now. Please try again in a moment.";
-      messages.push({ role: 'assistant', content: reply });
+      messages.push({ role: 'ai', content: reply });
       appendMessage('ai', reply);
 
     } catch (err) {
@@ -2555,6 +2558,7 @@ function tsShowAuth() {
   document.getElementById('ts-verify-screen').style.display = 'none';
   document.getElementById('ts-auth-forms').style.display = 'block';
   document.getElementById('ts-forgot-screen').style.display = 'none';
+  document.getElementById('ts-newpass-screen').style.display = 'none';
   document.getElementById('ts-dash-screen').style.display = 'none';
 }
 function tsShowVerify() {
@@ -2564,7 +2568,7 @@ function tsShowVerify() {
   document.getElementById('ts-forgot-screen').style.display = 'none';
   document.getElementById('ts-dash-screen').style.display = 'none';
 }
-async function tsShowDashboard() {
+function tsShowDashboard() {
   document.getElementById('ts-auth-screen').style.display = 'none';
   document.getElementById('ts-verify-screen').style.display = 'none';
   document.getElementById('ts-dash-screen').style.display = 'flex';
@@ -2877,6 +2881,7 @@ async function tsSend() {
   const input = document.getElementById('ts-input');
   const text = input.value.trim();
   if (!text || tsLoading) return;
+  tsSend._retrying = false; // clear any stale retry state on a fresh user send
   if (!tsActiveChat) { await tsNewChat(); }
 
   tsLoading = true;
@@ -3025,7 +3030,6 @@ function tsAutoResize(el) {
 }
 
 
-// ─── WORD DOCUMENT GENERATOR ───
 // ─── CONTEXT MENU ───
 let tsCtxContent = null;
 
@@ -3046,6 +3050,7 @@ function tsHideContextMenu() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // ─── CONTEXT MENU WIRING ───
   document.getElementById('ts-ctx-save-doc').onclick = (e) => {
     e.stopPropagation();
     const c = tsCtxContent;
@@ -3064,6 +3069,18 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') tsHideContextMenu();
   });
+
+  // ─── INPUT AUTO-RESIZE + ENTER TO SEND ───
+  const input = document.getElementById('ts-input');
+  if (input) {
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); tsSend(); }
+    });
+  }
 });
 
 async function tsCreateDoc(content) {
@@ -3087,7 +3104,7 @@ async function tsCreateDoc(content) {
           children: [new TextRun({ text: clean.replace(/^#+\s/, ''), font: 'Arial', size: 32, bold: true })],
           spacing: { before: 320, after: 160 }
         }));
-      } else if (line.startsWith('## ') || line.startsWith('**') && line.endsWith('**')) {
+      } else if (line.startsWith('## ') || (line.startsWith('**') && line.endsWith('**'))) {
         children.push(new Paragraph({
           children: [new TextRun({ text: clean.replace(/^#+\s/, ''), font: 'Arial', size: 26, bold: true })],
           spacing: { before: 240, after: 120 }
@@ -3267,20 +3284,6 @@ async function tsDeleteExample(id) {
   const card = document.getElementById(`review-card-${id}`);
   if (card) card.remove();
 }
-
-// ─── INPUT AUTO-RESIZE + ENTER TO SEND ───
-document.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById('ts-input');
-  if (input) {
-    input.addEventListener('input', () => {
-      input.style.height = 'auto';
-      input.style.height = Math.min(input.scrollHeight, 120) + 'px';
-    });
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); tsSend(); }
-    });
-  }
-});
 </script>
 
 
