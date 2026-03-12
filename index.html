@@ -3677,19 +3677,37 @@ async function tsGenerateDoc() {
     const promptFn = TS_DOC_PROMPTS[tsDocType];
     const userPrompt = promptFn(values);
 
-    const res = await fetch('/.netlify/functions/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: [{ role: 'user', content: userPrompt }],
-        system: 'You are a professional document writer for K-12 educators. When asked to create a document, respond ONLY with the document content in clean markdown — no preamble, no "Here is your document", no closing remarks. Use ## for section headers, **bold** for labels, bullet lists with -, and | pipe | tables where specified. Write complete, professional content ready for direct use.',
-        max_tokens: 2000,
-      })
-    });
+    const controller = new AbortController();
+    const fetchTimeout = setTimeout(() => controller.abort(), 40000); // 40s — doc gen needs more time than chat
 
-    const data = await res.json();
+    let res, data;
+    try {
+      res = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: userPrompt }],
+          system: 'You are a professional document writer for K-12 educators. When asked to create a document, respond ONLY with the document content in clean markdown — no preamble, no "Here is your document", no closing remarks. Use ## for section headers, **bold** for labels, bullet lists with -, and | pipe | tables where specified. Write complete, professional content ready for direct use.',
+          max_tokens: 1500,
+          docMode: true,
+        })
+      });
+    } finally {
+      clearTimeout(fetchTimeout);
+    }
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => res.status);
+      throw new Error('Server error ' + res.status + ': ' + errText);
+    }
+
+    data = await res.json();
     const markdown = data?.content?.[0]?.text;
-    if (!markdown) throw new Error('No content returned');
+    if (!markdown) {
+      const detail = data?.error?.message || data?.type || JSON.stringify(data).slice(0, 120);
+      throw new Error('No content in response: ' + detail);
+    }
 
     status.textContent = 'Building your Word document...';
     await tsDocBuildAndDownload(markdown, tsDocType, values);
@@ -3701,8 +3719,11 @@ async function tsGenerateDoc() {
 
   } catch (err) {
     console.error('Doc generation error:', err);
+    const isTimeout = err.name === 'AbortError';
     status.style.color = '#f87171';
-    status.textContent = 'Something went wrong. Please try again.';
+    status.textContent = isTimeout
+      ? 'Request timed out — the document was too long. Try filling in fewer details and generate again.'
+      : 'Error: ' + (err.message || 'Something went wrong. Please try again.');
     btn.disabled = false;
     btn.textContent = 'Generate & Download';
   }
