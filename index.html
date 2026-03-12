@@ -3771,8 +3771,7 @@ async function tsDocBuildAndDownload(markdown, docType, values) {
   }));
 
   // ── Parse markdown into docx elements ──
-  const lines = markdown.split('
-');
+  const lines = markdown.split('\n');
   let i = 0;
   while (i < lines.length) {
     const line = lines[i];
