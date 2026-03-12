@@ -2338,19 +2338,46 @@ function tsHandleFileUpload(e) {
   e.target.value = '';
 }
 
-// ── IMAGE: LOAD FILE TO BASE64 ──
+// ── IMAGE: LOAD FILE TO BASE64 (with compression) ──
 function tsLoadImageFile(file) {
   if (!file || !file.type.startsWith('image/')) return;
+
+  // Hard reject files over 20MB before even reading them
+  if (file.size > 20 * 1024 * 1024) {
+    tsShowInputError('Image is too large. Please use a photo under 20MB.');
+    return;
+  }
+
   const reader = new FileReader();
-  reader.onload = (e) => {
-    const dataUrl = e.target.result;
-    const base64 = dataUrl.split(',')[1];
-    const mediaType = file.type;
-    tsAttachedImage = { base64, mediaType };
-    // Show preview
-    document.getElementById('ts-img-thumb').src = dataUrl;
-    document.getElementById('ts-img-preview').style.display = 'block';
+  reader.onload = (evt) => {
+    const img = new Image();
+    img.onload = () => {
+      // Resize to max 1200px on longest side to stay well under payload limits
+      const MAX_PX = 1200;
+      let w = img.width, h = img.height;
+      if (w > MAX_PX || h > MAX_PX) {
+        if (w > h) { h = Math.round(h * MAX_PX / w); w = MAX_PX; }
+        else { w = Math.round(w * MAX_PX / h); h = MAX_PX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      // Compress as JPEG at 0.82 quality
+      const compressed = canvas.toDataURL('image/jpeg', 0.82);
+      const base64 = compressed.split(',')[1];
+      // Final size check — keep base64 under 1.5MB
+      if (base64.length > 1.5 * 1024 * 1024) {
+        tsShowInputError('Image is still too large after compression. Try a smaller image.');
+        return;
+      }
+      tsAttachedImage = { base64, mediaType: 'image/jpeg' };
+      document.getElementById('ts-img-thumb').src = compressed;
+      document.getElementById('ts-img-preview').style.display = 'block';
+    };
+    img.onerror = () => tsShowInputError('Could not read that image. Please try a different file.');
+    img.src = evt.target.result;
   };
+  reader.onerror = () => tsShowInputError('Could not load the image file. Please try again.');
   reader.readAsDataURL(file);
 }
 
@@ -2360,6 +2387,21 @@ function tsClearImage() {
   document.getElementById('ts-img-preview').style.display = 'none';
   document.getElementById('ts-img-thumb').src = '';
 }
+
+// ── INPUT ERROR DISPLAY ──
+function tsShowInputError(msg) {
+  const container = document.getElementById('ts-messages');
+  if (!container) return;
+  const el = document.createElement('div');
+  el.style.cssText = 'font-size:12px;color:#f87171;text-align:center;padding:6px 0 10px;';
+  el.textContent = msg;
+  container.appendChild(el);
+  const wrap = document.getElementById('ts-messages-wrap');
+  if (wrap) wrap.scrollTop = wrap.scrollHeight;
+  // Auto-remove after 6 seconds
+  setTimeout(() => el.remove(), 6000);
+}
+
 let tsPendingEmail = null;
 
 // ─── AUTH STATE ───
@@ -2898,12 +2940,18 @@ async function tsSend() {
   } else {
     userContent = text;
   }
-  // Warn if input is very large
-  if (text.length > 8000) {
-    const warn = document.createElement('div');
-    warn.style.cssText = 'font-size:11px;color:rgba(201,168,76,0.7);text-align:center;padding:4px 0 8px;';
-    warn.textContent = 'Large input detected — if this times out, try breaking it into smaller sections.';
-    document.getElementById('ts-messages').appendChild(warn);
+  // Hard cap on text length to prevent Netlify payload crash (6MB function limit)
+  // 24000 chars is a safe practical ceiling per message
+  const TEXT_LIMIT = 24000;
+  if (text.length > TEXT_LIMIT) {
+    tsLoading = false;
+    document.getElementById('ts-send-btn').disabled = false;
+    input.value = text; // restore so they don't lose it
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 160) + 'px';
+    tsShowInputError('That text is too long to send (' + text.length.toLocaleString() + ' characters). Please break it into smaller sections — around 20,000 characters max.');
+    tsClearImage(); // release any attached image so it doesn't get stuck
+    return;
   }
 
   tsMessages.push({ role: 'user', content: userContent });
