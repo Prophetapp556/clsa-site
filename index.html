@@ -1529,11 +1529,7 @@ Keep responses warm but concise — this is a sample experience. Use flowing pro
     wrap.appendChild(label);
     wrap.appendChild(bubble);
     chatHistory.appendChild(wrap);
-    if (role === 'ai') {
-      wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
+    chatHistory.scrollTop = chatHistory.scrollHeight;
   }
 
   function showTyping() {
@@ -2763,11 +2759,7 @@ function tsAppendMsg(role, content, scroll = true) {
   if (scroll) {
     const wrap = document.getElementById('ts-messages-wrap');
     if (wrap) {
-      if (role === 'ai') {
-        setTimeout(() => { div.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 30);
-      } else {
-        wrap.scrollTop = wrap.scrollHeight;
-      }
+      wrap.scrollTop = wrap.scrollHeight;
     }
   }
 }
@@ -2789,9 +2781,9 @@ function tsStreamMsg(fullText, onComplete) {
   div.appendChild(inner);
   container.appendChild(div);
 
-  // Scroll to message start
+  // Scroll to bottom
   const wrap = document.getElementById('ts-messages-wrap');
-  setTimeout(() => { div.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 30);
+  setTimeout(() => { if (wrap) wrap.scrollTop = wrap.scrollHeight; }, 30);
 
   // Split into words — preserve spacing
   const words = fullText.split(/(\s+)/);
