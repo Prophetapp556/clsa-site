@@ -750,6 +750,68 @@
     }
     .ts-signout:hover { color: rgba(255,255,255,0.6); }
 
+    /* ── DOC CREATOR MODAL ── */
+    .ts-doc-modal-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.75); display: flex;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .ts-doc-modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .ts-doc-modal {
+      background: #1a1a18; border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 16px; padding: 28px 28px 24px;
+      width: 540px; max-width: calc(100vw - 32px);
+      max-height: 90vh; overflow-y: auto;
+      transform: translateY(12px); transition: transform 0.2s;
+    }
+    .ts-doc-modal-overlay.open .ts-doc-modal { transform: translateY(0); }
+    .ts-doc-modal h2 {
+      font-family: 'Playfair Display', serif; font-size: 1.25rem;
+      color: #f0ede8; margin-bottom: 4px; font-weight: 600;
+    }
+    .ts-doc-modal-sub { font-size: 12px; color: rgba(255,255,255,0.35); margin-bottom: 22px; }
+    .ts-doc-type-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px;
+    }
+    .ts-doc-type-btn {
+      padding: 10px 12px; border-radius: 10px; cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.6); font-family: 'Raleway', sans-serif;
+      font-size: 12px; font-weight: 500; text-align: left;
+      transition: all 0.15s; display: flex; align-items: center; gap: 8px;
+    }
+    .ts-doc-type-btn:hover { border-color: rgba(201,168,76,0.4); color: #f0ede8; background: rgba(201,168,76,0.07); }
+    .ts-doc-type-btn.selected { border-color: rgba(201,168,76,0.7); background: rgba(201,168,76,0.12); color: #C9A84C; }
+    .ts-doc-fields { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .ts-doc-field label { display: block; font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 5px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .ts-doc-field input, .ts-doc-field select, .ts-doc-field textarea {
+      width: 100%; padding: 9px 12px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      color: #f0ede8; font-family: 'Raleway', sans-serif; font-size: 13px;
+      outline: none; transition: border-color 0.15s;
+    }
+    .ts-doc-field input:focus, .ts-doc-field select:focus, .ts-doc-field textarea:focus { border-color: rgba(201,168,76,0.5); }
+    .ts-doc-field textarea { resize: vertical; min-height: 72px; }
+    .ts-doc-field select option { background: #1a1a18; }
+    .ts-doc-modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .ts-doc-cancel-btn {
+      padding: 9px 18px; border-radius: 8px; background: none;
+      border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.45);
+      font-family: 'Raleway', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.15s;
+    }
+    .ts-doc-cancel-btn:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); }
+    .ts-doc-generate-btn {
+      padding: 9px 22px; border-radius: 8px;
+      background: linear-gradient(135deg, rgba(201,168,76,0.9), rgba(201,168,76,0.7));
+      border: none; color: #0a0a0a; font-family: 'Raleway', sans-serif;
+      font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.15s;
+    }
+    .ts-doc-generate-btn:hover { opacity: 0.85; }
+    .ts-doc-generate-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .ts-doc-status { font-size: 12px; color: rgba(201,168,76,0.7); margin-top: 10px; text-align: center; min-height: 18px; }
+
     /* ── MAIN AREA ── */
     .ts-main {
       flex: 1; display: flex; flex-direction: column;
@@ -1759,6 +1821,10 @@ Keep responses warm but concise — this is a sample experience. Use flowing pro
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             New Chat
           </button>
+          <button class="ts-new-btn" onclick="tsOpenDocModal()" style="margin-top:6px;border-color:rgba(201,168,76,0.25);color:rgba(201,168,76,0.8);" onmouseenter="this.style.borderColor='rgba(201,168,76,0.6)';this.style.color='#C9A84C';this.style.background='rgba(201,168,76,0.08)';" onmouseleave="this.style.borderColor='rgba(201,168,76,0.25)';this.style.color='rgba(201,168,76,0.8)';this.style.background='transparent';">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Create Document
+          </button>
         </div>
         <div class="ts-section-label">Recent</div>
         <div class="ts-chat-list-wrap">
@@ -1833,6 +1899,40 @@ Keep responses warm but concise — this is a sample experience. Use flowing pro
 
     </div><!-- end ts-dash-screen -->
   </div><!-- end ts-fullscreen -->
+
+  <!-- ─── DOCUMENT CREATOR MODAL ─── -->
+  <div class="ts-doc-modal-overlay" id="ts-doc-modal-overlay" onclick="tsDocModalOverlayClick(event)">
+    <div class="ts-doc-modal">
+      <h2>Create Document</h2>
+      <div class="ts-doc-modal-sub">AI-generated · Downloads as .docx · Ready to print or share</div>
+
+      <!-- Doc type selector -->
+      <div class="ts-doc-type-grid" id="ts-doc-type-grid">
+        <button class="ts-doc-type-btn selected" data-type="lesson" onclick="tsSelectDocType(this)">📋 Lesson Plan</button>
+        <button class="ts-doc-type-btn" data-type="behavior" onclick="tsSelectDocType(this)">📊 Behavior Report</button>
+        <button class="ts-doc-type-btn" data-type="iep" onclick="tsSelectDocType(this)">🗂️ IEP Progress Note</button>
+        <button class="ts-doc-type-btn" data-type="rti" onclick="tsSelectDocType(this)">📈 RTI / Intervention</button>
+        <button class="ts-doc-type-btn" data-type="meeting" onclick="tsSelectDocType(this)">📅 Meeting Agenda</button>
+        <button class="ts-doc-type-btn" data-type="parent" onclick="tsSelectDocType(this)">✉️ Parent Letter</button>
+        <button class="ts-doc-type-btn" data-type="sub" onclick="tsSelectDocType(this)">📝 Sub Plan</button>
+        <button class="ts-doc-type-btn" data-type="contract" onclick="tsSelectDocType(this)">🤝 Behavior Contract</button>
+        <button class="ts-doc-type-btn" data-type="conference" onclick="tsSelectDocType(this)">👥 Conference Notes</button>
+        <button class="ts-doc-type-btn" data-type="discipline" onclick="tsSelectDocType(this)">📨 Disciplinary Notice</button>
+      </div>
+
+      <!-- Dynamic fields -->
+      <div class="ts-doc-fields" id="ts-doc-fields"></div>
+
+      <div class="ts-doc-modal-actions">
+        <button class="ts-doc-cancel-btn" onclick="tsCloseDocModal()">Cancel</button>
+        <button class="ts-doc-generate-btn" id="ts-doc-gen-btn" onclick="tsGenerateDoc()">
+          Generate &amp; Download
+        </button>
+      </div>
+      <div class="ts-doc-status" id="ts-doc-status"></div>
+    </div>
+  </div>
+
 </div><!-- end page-ts --><!-- end page-ts -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -3185,6 +3285,624 @@ async function tsCreateDoc(content) {
     console.error('Doc generation error:', err);
     alert('Document generation failed. Please try again.');
   }
+}
+
+// ══════════════════════════════════════════
+// DOCUMENT CREATOR
+// ══════════════════════════════════════════
+
+const TS_DOC_FIELDS = {
+  lesson: [
+    { id: 'doc-subject',  label: 'Subject',     placeholder: 'e.g. Mathematics, Reading, Science' },
+    { id: 'doc-grade',    label: 'Grade Level', placeholder: 'e.g. 3rd Grade, 9th Grade' },
+    { id: 'doc-topic',    label: 'Topic / Objective', placeholder: 'e.g. Introduction to Fractions' },
+    { id: 'doc-duration', label: 'Class Duration', placeholder: 'e.g. 50 minutes' },
+    { id: 'doc-notes',    label: 'Additional Context (optional)', placeholder: 'IEP accommodations, class size, materials available...', type: 'textarea' },
+  ],
+  behavior: [
+    { id: 'doc-student',   label: 'Student (first name or initials)', placeholder: 'e.g. J.D.' },
+    { id: 'doc-grade',     label: 'Grade Level', placeholder: 'e.g. 5th Grade' },
+    { id: 'doc-incident',  label: 'Incident / Behavior to Document', placeholder: 'Brief description of what occurred' , type: 'textarea' },
+    { id: 'doc-date',      label: 'Date of Incident', placeholder: 'e.g. March 12, 2026' },
+    { id: 'doc-action',    label: 'Action Taken', placeholder: 'e.g. Parent contacted, office referral, restorative conversation' },
+  ],
+  iep: [
+    { id: 'doc-student',   label: 'Student (first name or initials)', placeholder: 'e.g. M.T.' },
+    { id: 'doc-grade',     label: 'Grade Level', placeholder: 'e.g. 2nd Grade' },
+    { id: 'doc-area',      label: 'Area of Focus', placeholder: 'e.g. Reading fluency, Math computation, Social-emotional' },
+    { id: 'doc-goal',      label: 'Current Goal / Benchmark', placeholder: 'Describe the goal or progress being documented' , type: 'textarea' },
+    { id: 'doc-notes',     label: 'Progress Notes / Observations', placeholder: 'What have you observed? What strategies are working?', type: 'textarea' },
+  ],
+  meeting: [
+    { id: 'doc-title',     label: 'Meeting Title', placeholder: 'e.g. 4th Grade Team Meeting, Parent-Teacher Conference' },
+    { id: 'doc-date',      label: 'Date & Time', placeholder: 'e.g. March 15, 2026 · 3:30 PM' },
+    { id: 'doc-attendees', label: 'Attendees', placeholder: 'e.g. Grade team, principal, parent, counselor' },
+    { id: 'doc-topics',    label: 'Topics to Cover', placeholder: 'List the main items you need to address', type: 'textarea' },
+  ],
+  parent: [
+    { id: 'doc-teacher',   label: 'Your Name & Role', placeholder: 'e.g. Ms. Johnson, 3rd Grade Teacher' },
+    { id: 'doc-student',   label: 'Student Name (first name or initials)', placeholder: 'e.g. Alex' },
+    { id: 'doc-purpose',   label: 'Purpose of Letter', placeholder: 'e.g. Behavior concern, academic progress update, celebration, field trip' },
+    { id: 'doc-details',   label: 'Key Points to Include', placeholder: 'What do you want the parent to know or do?', type: 'textarea' },
+    { id: 'doc-tone',      label: 'Tone', placeholder: 'e.g. Warm and supportive, Firm but respectful, Celebratory' },
+  ],
+
+  // ── RTI / MTSS Intervention Note (NC MTSS framework: 4-step problem-solving model) ──
+  rti: [
+    { id: 'doc-student',     label: 'Student (first name or initials)', placeholder: 'e.g. K.B.' },
+    { id: 'doc-grade',       label: 'Grade Level', placeholder: 'e.g. 1st Grade' },
+    { id: 'doc-tier',        label: 'Intervention Tier', placeholder: 'e.g. Tier 1, Tier 2, Tier 3' },
+    { id: 'doc-area',        label: 'Area of Concern', placeholder: 'e.g. Reading fluency, Math computation, Behavior, Attendance' },
+    { id: 'doc-baseline',    label: 'Baseline Data', placeholder: 'Current performance level with measurement (e.g. 42 wpm, 3 office referrals/week)' },
+    { id: 'doc-goal',        label: 'Goal / Target', placeholder: 'Expected performance level and timeline (e.g. 60 wpm in 8 weeks)' },
+    { id: 'doc-intervention',label: 'Intervention / Strategy', placeholder: 'What evidence-based intervention is being implemented?', type: 'textarea' },
+    { id: 'doc-progress',    label: 'Progress Monitoring Method', placeholder: 'e.g. Weekly DIBELS probe, daily behavior chart, bi-weekly math check' },
+  ],
+
+  // ── Sub Plan ──
+  sub: [
+    { id: 'doc-teacher',   label: 'Your Name & Subject/Grade', placeholder: 'e.g. Mr. Davis, 7th Grade ELA' },
+    { id: 'doc-date',      label: 'Date(s) Absent', placeholder: 'e.g. March 15, 2026' },
+    { id: 'doc-schedule',  label: 'Class Schedule', placeholder: 'e.g. Period 1: 8:05–8:55, Period 2: 9:00–9:50...', type: 'textarea' },
+    { id: 'doc-activities',label: 'Activities / Lessons for Each Period', placeholder: 'Describe what students should do for each class period', type: 'textarea' },
+    { id: 'doc-notes',     label: 'Important Notes for Sub', placeholder: 'Seating chart location, student alerts, bathroom policy, emergencies...' },
+  ],
+
+  // ── Student Behavior Contract ──
+  contract: [
+    { id: 'doc-student',   label: 'Student Name (first name or initials)', placeholder: 'e.g. T.W.' },
+    { id: 'doc-grade',     label: 'Grade Level', placeholder: 'e.g. 6th Grade' },
+    { id: 'doc-behaviors', label: 'Target Behaviors to Address', placeholder: 'What specific behaviors need to change?', type: 'textarea' },
+    { id: 'doc-goals',     label: 'Student Goals / Commitments', placeholder: 'What the student agrees to do differently', type: 'textarea' },
+    { id: 'doc-supports',  label: 'Adult Supports & Rewards', placeholder: 'What adults will do to help, and what the student earns for meeting goals' },
+    { id: 'doc-duration',  label: 'Contract Duration / Review Date', placeholder: 'e.g. 2 weeks, review on March 29' },
+  ],
+
+  // ── Conference Summary Notes ──
+  conference: [
+    { id: 'doc-teacher',    label: 'Teacher Name & Role', placeholder: 'e.g. Ms. Williams, 4th Grade' },
+    { id: 'doc-student',    label: 'Student (first name or initials)', placeholder: 'e.g. J.P.' },
+    { id: 'doc-date',       label: 'Conference Date & Time', placeholder: 'e.g. March 12, 2026 · 5:00 PM' },
+    { id: 'doc-attendees',  label: 'Who Attended', placeholder: 'e.g. Teacher, parent/guardian, counselor, student' },
+    { id: 'doc-topics',     label: 'Topics Discussed', placeholder: 'Academic progress, behavior, supports, concerns raised by parent...', type: 'textarea' },
+    { id: 'doc-nextsteps',  label: 'Action Items / Next Steps', placeholder: 'What was agreed upon? Who is responsible for what?' },
+  ],
+
+  // ── Disciplinary Notice Letter (NC G.S. 115C-390 compliant) ──
+  discipline: [
+    { id: 'doc-student',    label: 'Student Name (first name or initials)', placeholder: 'e.g. A.R.' },
+    { id: 'doc-grade',      label: 'Grade Level', placeholder: 'e.g. 8th Grade' },
+    { id: 'doc-date',       label: 'Date of Incident', placeholder: 'e.g. March 12, 2026' },
+    { id: 'doc-violation',  label: 'Policy / Code Violation', placeholder: 'e.g. Fighting (Code 4.1), Possession of prohibited item (Code 5.2)' },
+    { id: 'doc-description',label: 'Description of Incident', placeholder: 'Factual, objective description of what occurred', type: 'textarea' },
+    { id: 'doc-action',     label: 'Disciplinary Action', placeholder: 'e.g. 1-day in-school suspension, parent conference required, loss of privileges' },
+    { id: 'doc-contact',    label: 'Administrator / Contact Name', placeholder: 'Name and title of issuing administrator' },
+  ],
+};
+
+const TS_DOC_PROMPTS = {
+  lesson: (f) => `Create a complete, professional lesson plan as a structured document. Format using markdown with clear sections.
+
+Subject: ${f.subject}
+Grade Level: ${f.grade}
+Topic / Objective: ${f.topic}
+Class Duration: ${f.duration}
+${f.notes ? 'Additional Context: ' + f.notes : ''}
+
+Include these sections with ## headers:
+## Lesson Overview
+## Learning Objectives (bullet list, 3-4 objectives)
+## Standards Alignment
+## Materials Needed
+## Lesson Outline (phase | time | activity — formatted as a clear table using | pipes |)
+## Differentiation (Support, On Grade Level, Extension)
+## Assessment & Reflection Notes
+
+Be specific, practical, and directly usable in a classroom. Use educator language.`,
+
+  behavior: (f) => `Create a professional student behavior incident report as a structured document.
+
+Student: ${f.student}
+Grade: ${f.grade}
+Date: ${f.date}
+Incident: ${f.incident}
+Action Taken: ${f.action}
+
+Include these sections with ## headers:
+## Incident Summary
+## Student Information
+## Description of Behavior
+## Antecedents / Context
+## Interventions & Actions Taken
+## Parent / Guardian Communication
+## Follow-Up Plan
+## Teacher Signature Block (blank lines for signature and date)
+
+Use objective, professional language appropriate for a school record.`,
+
+  iep: (f) => `Create a professional IEP progress note / intervention record as a structured document.
+
+Student: ${f.student}
+Grade: ${f.grade}
+Area of Focus: ${f.area}
+Goal: ${f.goal}
+Observations: ${f.notes}
+
+Include these sections with ## headers:
+## Student Information
+## Area of Focus & Current Goal
+## Progress Summary
+## Observations & Evidence
+## Strategies & Interventions in Use
+## Next Steps
+## Service Provider Notes (blank lines)
+
+Use clinical, objective language appropriate for special education documentation.`,
+
+  meeting: (f) => `Create a professional meeting agenda as a structured document.
+
+Meeting Title: ${f.title}
+Date & Time: ${f.date}
+Attendees: ${f.attendees}
+Topics: ${f.topics}
+
+Include these sections with ## headers:
+## Meeting Details
+## Attendees
+## Agenda Items (numbered list with time estimates for each)
+## Discussion Notes (blank lines under each agenda item)
+## Action Items (table: Task | Owner | Due Date)
+## Next Meeting
+
+Keep it clean and functional — something attendees can print and follow along.`,
+
+  parent: (f) => `Create a professional parent communication letter as a structured document.
+
+Teacher: ${f.teacher}
+Student: ${f.student}
+Purpose: ${f.purpose}
+Key Points: ${f.details}
+Tone: ${f.tone}
+
+Format as a formal letter with:
+- Date line
+- Salutation (Dear Parent/Guardian of [student],)
+- Opening paragraph
+- Body paragraphs covering the key points
+- Clear call to action or next steps
+- Closing (Warm regards / Sincerely)
+- Teacher name, role, and contact line
+
+Write it ready to print and send home. Match the requested tone throughout.`,
+
+  rti: (f) => `Create a professional RTI/MTSS Intervention Progress Note following North Carolina's Multi-Tiered System of Support (NC MTSS) framework and the four-step problem-solving model.
+
+Student: ${f.student}
+Grade: ${f.grade}
+Intervention Tier: ${f.tier}
+Area of Concern: ${f.area}
+Baseline Data: ${f.baseline}
+Goal / Target: ${f.goal}
+Intervention / Strategy: ${f.intervention}
+Progress Monitoring Method: ${f.progress}
+Date: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}
+
+Include these sections with ## headers:
+## Student Information
+## Intervention Tier & Area of Concern
+## Step 1: Problem Identification (current performance vs. expected, baseline data)
+## Step 2: Problem Analysis (likely barriers to meeting the goal)
+## Step 3: Intervention Plan (evidence-based strategy, frequency, duration, who delivers it)
+## Step 4: Progress Monitoring (how and how often data is collected, decision rules)
+## Current Progress Summary
+## Parent Communication (date parents were informed and how)
+## Team Signatures (blank lines: Teacher, Interventionist, Administrator, Date)
+
+Use NC MTSS documentation language. Be specific and data-driven. Note that NC requires identifying students at risk beginning in kindergarten and that parents/guardians must be included in implementation and review.`,
+
+  sub: (f) => `Create a detailed substitute teacher plan that is clear enough for someone unfamiliar with the classroom to execute smoothly.
+
+Teacher: ${f.teacher}
+Date(s): ${f.date}
+Class Schedule: ${f.schedule}
+Activities / Lessons: ${f.activities}
+Important Notes: ${f.notes}
+
+Include these sections with ## headers:
+## Teacher Information & Date(s)
+## Welcome & Overview (brief welcome note to the sub, tone of class expectations)
+## Class Schedule (table: Period | Time | Class | Room)
+## Lesson Plans by Period (detailed instructions for each period — what to do, how long, what to hand out)
+## Classroom Procedures (attendance, bathroom, early finishers, transitions)
+## Important Student Notes (any alerts the sub needs to know — keep confidential, first name or initials only)
+## Emergency & Logistics (emergency procedures, where things are located, who to call)
+## End of Day (what to leave on the desk, how to dismiss)
+
+Write clear, step-by-step instructions. Assume the sub has never been in this classroom before.`,
+
+  contract: (f) => `Create a professional student behavior contract that is collaborative, respectful, and appropriate for a school setting.
+
+Student: ${f.student}
+Grade: ${f.grade}
+Target Behaviors: ${f.behaviors}
+Student Goals: ${f.goals}
+Adult Supports & Rewards: ${f.supports}
+Contract Duration: ${f.duration}
+
+Include these sections with ## headers:
+## What This Contract Is About (student-friendly explanation of purpose)
+## Behaviors We Are Working On (specific, observable behavior statements)
+## Student Commitments (what the student agrees to do — written in first person, e.g. "I will...")
+## How Adults Will Help (specific supports, check-ins, accommodations)
+## Rewards & Positive Reinforcement (specific, achievable rewards tied to goals)
+## How We Will Know It's Working (how progress is measured and reviewed)
+## Review Date
+## Signatures (blank lines: Student, Teacher, Parent/Guardian, Administrator, Date)
+
+Write it in language a student can understand. The contract should feel like a partnership, not a punishment.`,
+
+  conference: (f) => `Create a professional parent-teacher conference summary note for the school record.
+
+Teacher: ${f.teacher}
+Student: ${f.student}
+Date & Time: ${f.date}
+Attendees: ${f.attendees}
+Topics Discussed: ${f.topics}
+Action Items / Next Steps: ${f.nextsteps}
+
+Include these sections with ## headers:
+## Conference Information (date, time, attendees, student)
+## Academic Progress Summary
+## Social-Emotional & Behavioral Notes
+## Topics & Concerns Discussed
+## Strengths Identified
+## Areas for Growth / Support Needed
+## Action Items (table: Action | Responsible Party | Timeline)
+## Follow-Up Plan
+## Signatures (blank lines: Teacher, Parent/Guardian, Date)
+
+Use professional, objective language. This document is part of the student's record. Note any concerns raised by the parent and how they were addressed.`,
+
+  discipline: (f) => `Create a professional student disciplinary notice letter compliant with North Carolina G.S. 115C-390 and the NC Code of Student Conduct.
+
+Student: ${f.student}
+Grade: ${f.grade}
+Date of Incident: ${f.date}
+Policy / Code Violation: ${f.violation}
+Description: ${f.description}
+Disciplinary Action: ${f.action}
+Issuing Administrator: ${f.contact}
+
+Include these sections with ## headers:
+## Notice of Disciplinary Action
+## Student & Incident Information
+## Description of Violation (factual, objective, specific policy code cited)
+## Disciplinary Action Imposed
+## Parent/Guardian Rights (include NC G.S. 115C-390 language: right to review records, right to appeal, right to request a conference within 3 days)
+## Appeal Process (state that parent may request review of the decision in writing within 3 business days)
+## Required Next Steps (any conditions student must meet to return / remain in good standing)
+## Contact Information (who to reach for questions — name, role, phone/email)
+## Signature Block (blank lines: Administrator, Title, Date; Parent Acknowledgment signature line)
+
+Use formal, legally appropriate language. Cite the specific policy code violated. Include all required NC parent rights notifications. Keep descriptions factual and free of emotional language.`,
+};
+
+const TS_DOC_LABELS = {
+  lesson:     'Lesson Plan',
+  behavior:   'Behavior Incident Report',
+  iep:        'IEP Progress Note',
+  rti:        'RTI / MTSS Intervention Note',
+  meeting:    'Meeting Agenda',
+  parent:     'Parent Letter',
+  sub:        'Substitute Teacher Plan',
+  contract:   'Student Behavior Contract',
+  conference: 'Conference Summary',
+  discipline: 'Disciplinary Notice',
+};
+
+let tsDocType = 'lesson';
+
+function tsOpenDocModal() {
+  document.getElementById('ts-doc-modal-overlay').classList.add('open');
+  tsRenderDocFields('lesson');
+}
+
+function tsCloseDocModal() {
+  document.getElementById('ts-doc-modal-overlay').classList.remove('open');
+  document.getElementById('ts-doc-status').textContent = '';
+  document.getElementById('ts-doc-gen-btn').disabled = false;
+  document.getElementById('ts-doc-gen-btn').textContent = 'Generate & Download';
+}
+
+function tsDocModalOverlayClick(e) {
+  if (e.target === document.getElementById('ts-doc-modal-overlay')) tsCloseDocModal();
+}
+
+function tsSelectDocType(btn) {
+  document.querySelectorAll('.ts-doc-type-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  tsDocType = btn.dataset.type;
+  tsRenderDocFields(tsDocType);
+}
+
+function tsRenderDocFields(type) {
+  const fields = TS_DOC_FIELDS[type] || [];
+  const container = document.getElementById('ts-doc-fields');
+  container.innerHTML = fields.map(f => {
+    if (f.type === 'textarea') {
+      return `<div class="ts-doc-field"><label>${f.label}</label><textarea id="${f.id}" placeholder="${f.placeholder}"></textarea></div>`;
+    }
+    if (f.type === 'select') {
+      const opts = f.options.map(o => `<option value="${o}">${o}</option>`).join('');
+      return `<div class="ts-doc-field"><label>${f.label}</label><select id="${f.id}"><option value="" disabled selected>${f.placeholder}</option>${opts}</select></div>`;
+    }
+    return `<div class="ts-doc-field"><label>${f.label}</label><input type="text" id="${f.id}" placeholder="${f.placeholder}" /></div>`;
+  }).join('');
+  // Auto-populate today's date in any doc-date field
+  const dateEl = document.getElementById('doc-date');
+  if (dateEl && !dateEl.value) {
+    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    dateEl.placeholder = today;
+  }
+}
+
+async function tsGenerateDoc() {
+  const btn = document.getElementById('ts-doc-gen-btn');
+  const status = document.getElementById('ts-doc-status');
+
+  // Collect fields
+  const fields = TS_DOC_FIELDS[tsDocType] || [];
+  const values = {};
+  for (const f of fields) {
+    const el = document.getElementById(f.id);
+    values[f.id.replace('doc-', '')] = el ? el.value.trim() : '';
+  }
+
+  // Require at least the first two fields
+  const firstTwo = fields.slice(0, 2);
+  for (const f of firstTwo) {
+    if (!values[f.id.replace('doc-', '')]) {
+      status.textContent = 'Please fill in at least the first two fields.';
+      status.style.color = '#f87171';
+      return;
+    }
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  status.style.color = 'rgba(201,168,76,0.7)';
+  status.textContent = 'Asking ProphetApp AI to write your document...';
+
+  try {
+    const promptFn = TS_DOC_PROMPTS[tsDocType];
+    const userPrompt = promptFn(values);
+
+    const res = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: userPrompt }],
+        system: 'You are a professional document writer for K-12 educators. When asked to create a document, respond ONLY with the document content in clean markdown — no preamble, no "Here is your document", no closing remarks. Use ## for section headers, **bold** for labels, bullet lists with -, and | pipe | tables where specified. Write complete, professional content ready for direct use.',
+        max_tokens: 2000,
+      })
+    });
+
+    const data = await res.json();
+    const markdown = data?.content?.[0]?.text;
+    if (!markdown) throw new Error('No content returned');
+
+    status.textContent = 'Building your Word document...';
+    await tsDocBuildAndDownload(markdown, tsDocType, values);
+
+    status.style.color = 'rgba(100,200,100,0.8)';
+    status.textContent = '✓ Document downloaded successfully.';
+    btn.textContent = 'Done!';
+    setTimeout(() => tsCloseDocModal(), 1800);
+
+  } catch (err) {
+    console.error('Doc generation error:', err);
+    status.style.color = '#f87171';
+    status.textContent = 'Something went wrong. Please try again.';
+    btn.disabled = false;
+    btn.textContent = 'Generate & Download';
+  }
+}
+
+async function tsDocBuildAndDownload(markdown, docType, values) {
+  const {
+    Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+    Header, Footer, AlignmentType, BorderStyle, WidthType, ShadingType,
+    VerticalAlign, LevelFormat, TabStopType, PageNumberElement, PageNumberType
+  } = docx;
+
+  const GOLD = 'C9A84C', GOLD_LIGHT = 'F5ECD0', DARK = '1A1A1A';
+  const GRAY_BG = 'F7F7F5', WHITE = 'FFFFFF', GRAY_MID = 'E8E4DC';
+
+  const cellBorder = { style: BorderStyle.SINGLE, size: 1, color: 'D4C89A' };
+  const allBorders = { top: cellBorder, bottom: cellBorder, left: cellBorder, right: cellBorder };
+  const noBorder = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
+  const noBorders = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder };
+
+  // ── Header ──
+  const header = new Header({ children: [
+    new Paragraph({
+      children: [
+        new TextRun({ text: 'ProphetApp AI  ·  Teachers Space', font: 'Arial', size: 18, color: GOLD, bold: true }),
+        new TextRun({ text: '	', font: 'Arial', size: 18 }),
+        new TextRun({ text: 'Carolina LifeStock Association', font: 'Arial', size: 18, color: '888880' }),
+      ],
+      tabStops: [{ type: TabStopType.RIGHT, position: 9360 }],
+      border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: GOLD, space: 1 } },
+      spacing: { before: 0, after: 160 }
+    })
+  ]});
+
+  // ── Footer ──
+  const footer = new Footer({ children: [
+    new Paragraph({
+      children: [
+        new TextRun({ text: 'Generated by ProphetApp AI  ·  carolinalsa.com', font: 'Arial', size: 16, color: 'AAAAAA' }),
+        new TextRun({ text: '	Page ', font: 'Arial', size: 16, color: 'AAAAAA' }),
+        new PageNumberElement(PageNumberType.CURRENT, { font: 'Arial', size: 16, color: 'AAAAAA' }),
+      ],
+      tabStops: [{ type: TabStopType.RIGHT, position: 9360 }],
+      border: { top: { style: BorderStyle.SINGLE, size: 2, color: GOLD_LIGHT, space: 1 } },
+      spacing: { before: 120, after: 0 }
+    })
+  ]});
+
+  const children = [];
+
+  // ── Title block ──
+  const label = TS_DOC_LABELS[docType] || 'Document';
+  const titleText = values.topic || values.title || values.purpose || values.area || label;
+  children.push(new Paragraph({
+    children: [new TextRun({ text: label.toUpperCase(), font: 'Arial', size: 18, bold: true, color: GOLD, characterSpacing: 120 })],
+    spacing: { before: 200, after: 80 }
+  }));
+  children.push(new Paragraph({
+    children: [new TextRun({ text: titleText, font: 'Arial', size: 42, bold: true, color: DARK })],
+    spacing: { before: 0, after: 80 }
+  }));
+  children.push(new Paragraph({
+    children: [new TextRun('')],
+    border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: GOLD, space: 1 } },
+    spacing: { before: 80, after: 200 }
+  }));
+
+  // ── Parse markdown into docx elements ──
+  const lines = markdown.split('
+');
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    if (!trimmed) { children.push(new Paragraph({ children: [new TextRun('')], spacing: { before: 60, after: 0 } })); i++; continue; }
+
+    // H2 section header
+    if (trimmed.startsWith('## ')) {
+      const text = trimmed.replace(/^##\s+/, '');
+      children.push(new Paragraph({
+        children: [new TextRun({ text: text.toUpperCase(), font: 'Arial', size: 18, bold: true, color: GOLD, characterSpacing: 80 })],
+        spacing: { before: 280, after: 80 }
+      }));
+      i++; continue;
+    }
+
+    // H1
+    if (trimmed.startsWith('# ')) {
+      const text = trimmed.replace(/^#\s+/, '');
+      children.push(new Paragraph({
+        children: [new TextRun({ text, font: 'Arial', size: 32, bold: true, color: DARK })],
+        spacing: { before: 200, after: 120 }
+      }));
+      i++; continue;
+    }
+
+    // H3
+    if (trimmed.startsWith('### ')) {
+      const text = trimmed.replace(/^###\s+/, '');
+      children.push(new Paragraph({
+        children: [new TextRun({ text, font: 'Arial', size: 24, bold: true, color: DARK })],
+        spacing: { before: 160, after: 80 }
+      }));
+      i++; continue;
+    }
+
+    // Table: collect all pipe rows
+    if (trimmed.startsWith('|')) {
+      const tableLines = [];
+      while (i < lines.length && lines[i].trim().startsWith('|')) {
+        tableLines.push(lines[i].trim());
+        i++;
+      }
+      // Skip separator row
+      const dataRows = tableLines.filter(l => !l.match(/^\|[-:\s|]+\|$/));
+      if (dataRows.length > 0) {
+        const parsed = dataRows.map(l => l.replace(/^\||\|$/g, '').split('|').map(c => c.trim()));
+        const colCount = parsed[0].length;
+        const colWidth = Math.floor(9360 / colCount);
+        const colWidths = Array(colCount).fill(colWidth);
+
+        const tableRows = parsed.map((cells, ri) => {
+          const isHeader = ri === 0;
+          return new TableRow({ children: cells.map((cellText, ci) => new TableCell({
+            borders: allBorders,
+            width: { size: colWidths[ci], type: WidthType.DXA },
+            shading: { fill: isHeader ? GOLD : (ri % 2 === 0 ? WHITE : GRAY_BG), type: ShadingType.CLEAR },
+            margins: { top: 80, bottom: 80, left: 120, right: 120 },
+            children: [new Paragraph({
+              children: [new TextRun({ text: cellText, font: 'Arial', size: 20, bold: isHeader, color: isHeader ? WHITE : DARK })],
+              spacing: { before: 0, after: 0 }
+            })]
+          }))});
+        });
+        children.push(new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: colWidths, rows: tableRows }));
+        children.push(new Paragraph({ children: [new TextRun('')], spacing: { before: 120, after: 0 } }));
+      }
+      continue;
+    }
+
+    // Bullet
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      const text = trimmed.replace(/^[-*]\s+/, '');
+      const runs = tsDocParseInline(text, DARK);
+      children.push(new Paragraph({
+        numbering: { reference: 'doc-bullets', level: 0 },
+        children: runs,
+        spacing: { before: 40, after: 60 }
+      }));
+      i++; continue;
+    }
+
+    // Numbered list
+    if (/^\d+\.\s/.test(trimmed)) {
+      const text = trimmed.replace(/^\d+\.\s+/, '');
+      const runs = tsDocParseInline(text, DARK);
+      children.push(new Paragraph({
+        numbering: { reference: 'doc-numbers', level: 0 },
+        children: runs,
+        spacing: { before: 40, after: 60 }
+      }));
+      i++; continue;
+    }
+
+    // Regular paragraph with inline bold
+    const runs = tsDocParseInline(trimmed, DARK);
+    children.push(new Paragraph({ children: runs, spacing: { before: 40, after: 80 } }));
+    i++;
+  }
+
+  const doc = new Document({
+    numbering: {
+      config: [
+        { reference: 'doc-bullets', levels: [{ level: 0, format: LevelFormat.BULLET, text: '•', alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 480, hanging: 240 } } } }] },
+        { reference: 'doc-numbers', levels: [{ level: 0, format: LevelFormat.DECIMAL, text: '%1.', alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 480, hanging: 240 } } } }] },
+      ]
+    },
+    styles: { default: { document: { run: { font: 'Arial', size: 22 } } } },
+    sections: [{
+      properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1080, right: 1080, bottom: 1080, left: 1080 } } },
+      headers: { default: header },
+      footers: { default: footer },
+      children
+    }]
+  });
+
+  const blob = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const filename = (label + ' - ' + titleText).replace(/[^a-zA-Z0-9 \-]/g, '').trim() + '.docx';
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function tsDocParseInline(text, defaultColor) {
+  const {TextRun} = docx;
+  const parts = text.split(/\*\*(.*?)\*\*/g);
+  return parts.map((p, i) => new TextRun({ text: p, font: 'Arial', size: 22, bold: i % 2 === 1, color: defaultColor }));
 }
 
 // ─── HELPER ───
