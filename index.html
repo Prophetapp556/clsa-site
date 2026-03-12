@@ -1936,7 +1936,7 @@ Keep responses warm but concise — this is a sample experience. Use flowing pro
 </div><!-- end page-ts --><!-- end page-ts -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <script>
 /* ═══════════════════════════════════════
    TEACHERS SPACE — SUPABASE + CHAT
@@ -3730,6 +3730,17 @@ async function tsGenerateDoc() {
 }
 
 async function tsDocBuildAndDownload(markdown, docType, values) {
+  // Guard: wait up to 5s for docx library to load
+  if (typeof docx === 'undefined') {
+    for (let i = 0; i < 50; i++) {
+      await new Promise(r => setTimeout(r, 100));
+      if (typeof docx !== 'undefined') break;
+    }
+    if (typeof docx === 'undefined') {
+      throw new Error('Document library failed to load. Please refresh the page and try again.');
+    }
+  }
+
   const {
     Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
     Header, Footer, AlignmentType, BorderStyle, WidthType, ShadingType,
