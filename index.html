@@ -3293,298 +3293,271 @@ async function tsCreateDoc(content) {
 
 const TS_DOC_FIELDS = {
   lesson: [
-    { id: 'doc-subject',  label: 'Subject',     placeholder: 'e.g. Mathematics, Reading, Science' },
-    { id: 'doc-grade',    label: 'Grade Level', placeholder: 'e.g. 3rd Grade, 9th Grade' },
-    { id: 'doc-topic',    label: 'Topic / Objective', placeholder: 'e.g. Introduction to Fractions' },
-    { id: 'doc-duration', label: 'Class Duration', placeholder: 'e.g. 50 minutes' },
-    { id: 'doc-notes',    label: 'Additional Context (optional)', placeholder: 'IEP accommodations, class size, materials available...', type: 'textarea' },
+    { id: 'doc-grade',    label: 'Grade Level',         placeholder: 'e.g. 3rd Grade, 9th Grade' },
+    { id: 'doc-subject',  label: 'Subject',             placeholder: 'e.g. Mathematics, ELA, Science' },
+    { id: 'doc-topic',    label: 'Topic / Standard',    placeholder: 'e.g. Introduction to Fractions, RI.4.2' },
+    { id: 'doc-notes',    label: 'Anything special about this class? (optional)', placeholder: 'IEP students, co-teacher, materials available, pacing needs...', type: 'textarea' },
   ],
   behavior: [
-    { id: 'doc-student',   label: 'Student (first name or initials)', placeholder: 'e.g. J.D.' },
-    { id: 'doc-grade',     label: 'Grade Level', placeholder: 'e.g. 5th Grade' },
-    { id: 'doc-incident',  label: 'Incident / Behavior to Document', placeholder: 'Brief description of what occurred' , type: 'textarea' },
-    { id: 'doc-date',      label: 'Date of Incident', placeholder: 'e.g. March 12, 2026' },
-    { id: 'doc-action',    label: 'Action Taken', placeholder: 'e.g. Parent contacted, office referral, restorative conversation' },
+    { id: 'doc-student',  label: 'Student (initials only)', placeholder: 'e.g. J.D.' },
+    { id: 'doc-grade',    label: 'Grade',               placeholder: 'e.g. 5th Grade' },
+    { id: 'doc-incident', label: 'What happened?',      placeholder: 'Describe the incident factually — what you saw and heard', type: 'textarea' },
+    { id: 'doc-action',   label: 'What did you do?',    placeholder: 'e.g. Redirected verbally, called parent, sent to office' },
   ],
   iep: [
-    { id: 'doc-student',   label: 'Student (first name or initials)', placeholder: 'e.g. M.T.' },
-    { id: 'doc-grade',     label: 'Grade Level', placeholder: 'e.g. 2nd Grade' },
-    { id: 'doc-area',      label: 'Area of Focus', placeholder: 'e.g. Reading fluency, Math computation, Social-emotional' },
-    { id: 'doc-goal',      label: 'Current Goal / Benchmark', placeholder: 'Describe the goal or progress being documented' , type: 'textarea' },
-    { id: 'doc-notes',     label: 'Progress Notes / Observations', placeholder: 'What have you observed? What strategies are working?', type: 'textarea' },
+    { id: 'doc-student',  label: 'Student (initials only)', placeholder: 'e.g. M.T.' },
+    { id: 'doc-grade',    label: 'Grade',               placeholder: 'e.g. 2nd Grade' },
+    { id: 'doc-area',     label: 'Area of Focus',       placeholder: 'e.g. Reading fluency, Math computation, Social-emotional' },
+    { id: 'doc-notes',    label: 'What are you seeing? What is working?', placeholder: 'Progress, struggles, strategies tried, data you have...', type: 'textarea' },
+  ],
+  rti: [
+    { id: 'doc-student',  label: 'Student (initials only)', placeholder: 'e.g. K.B.' },
+    { id: 'doc-grade',    label: 'Grade',               placeholder: 'e.g. 1st Grade' },
+    { id: 'doc-tier',     label: 'Tier',                type: 'select', placeholder: 'Select tier', options: ['Tier 1', 'Tier 2', 'Tier 3'] },
+    { id: 'doc-area',     label: 'Area of Concern',     type: 'select', placeholder: 'Select area', options: ['Reading', 'Math', 'Writing', 'Behavior', 'Attendance', 'Social-Emotional'] },
+    { id: 'doc-notes',    label: 'Describe the situation — data, goals, what has been tried', placeholder: 'Include any numbers you have (e.g. 42 wpm, 3 referrals/week) and what interventions are in place', type: 'textarea' },
   ],
   meeting: [
-    { id: 'doc-title',     label: 'Meeting Title', placeholder: 'e.g. 4th Grade Team Meeting, Parent-Teacher Conference' },
-    { id: 'doc-date',      label: 'Date & Time', placeholder: 'e.g. March 15, 2026 · 3:30 PM' },
-    { id: 'doc-attendees', label: 'Attendees', placeholder: 'e.g. Grade team, principal, parent, counselor' },
-    { id: 'doc-topics',    label: 'Topics to Cover', placeholder: 'List the main items you need to address', type: 'textarea' },
+    { id: 'doc-title',    label: 'Meeting Type',        placeholder: 'e.g. Grade Team PLC, Parent Conference, IEP Meeting' },
+    { id: 'doc-goal',     label: 'Goal of this meeting', placeholder: 'What needs to be decided or accomplished?' },
+    { id: 'doc-attendees',label: 'Who is attending',    placeholder: 'e.g. Grade team, principal, parent, counselor' },
+    { id: 'doc-topics',   label: 'Topics to cover',     placeholder: 'List the items — one per line or comma separated', type: 'textarea' },
   ],
   parent: [
-    { id: 'doc-teacher',   label: 'Your Name & Role', placeholder: 'e.g. Ms. Johnson, 3rd Grade Teacher' },
-    { id: 'doc-student',   label: 'Student Name (first name or initials)', placeholder: 'e.g. Alex' },
-    { id: 'doc-purpose',   label: 'Purpose of Letter', placeholder: 'e.g. Behavior concern, academic progress update, celebration, field trip' },
-    { id: 'doc-details',   label: 'Key Points to Include', placeholder: 'What do you want the parent to know or do?', type: 'textarea' },
-    { id: 'doc-tone',      label: 'Tone', placeholder: 'e.g. Warm and supportive, Firm but respectful, Celebratory' },
+    { id: 'doc-student',  label: 'Student (first name or initials)', placeholder: 'e.g. Alex' },
+    { id: 'doc-purpose',  label: 'Purpose',             type: 'select', placeholder: 'Select purpose', options: ['Academic concern', 'Behavior concern', 'Positive update / celebration', 'Attendance concern', 'IEP / 504 follow-up', 'Field trip / event', 'General communication'] },
+    { id: 'doc-details',  label: 'What do you want the parent to know or do?', placeholder: 'Key points, any actions needed, context...', type: 'textarea' },
+    { id: 'doc-tone',     label: 'Tone',                type: 'select', placeholder: 'Select tone', options: ['Warm and supportive', 'Firm but respectful', 'Celebratory', 'Urgent'] },
   ],
-
-  // ── RTI / MTSS Intervention Note (NC MTSS framework: 4-step problem-solving model) ──
-  rti: [
-    { id: 'doc-student',     label: 'Student (first name or initials)', placeholder: 'e.g. K.B.' },
-    { id: 'doc-grade',       label: 'Grade Level', placeholder: 'e.g. 1st Grade' },
-    { id: 'doc-tier',        label: 'Intervention Tier', placeholder: 'e.g. Tier 1, Tier 2, Tier 3' },
-    { id: 'doc-area',        label: 'Area of Concern', placeholder: 'e.g. Reading fluency, Math computation, Behavior, Attendance' },
-    { id: 'doc-baseline',    label: 'Baseline Data', placeholder: 'Current performance level with measurement (e.g. 42 wpm, 3 office referrals/week)' },
-    { id: 'doc-goal',        label: 'Goal / Target', placeholder: 'Expected performance level and timeline (e.g. 60 wpm in 8 weeks)' },
-    { id: 'doc-intervention',label: 'Intervention / Strategy', placeholder: 'What evidence-based intervention is being implemented?', type: 'textarea' },
-    { id: 'doc-progress',    label: 'Progress Monitoring Method', placeholder: 'e.g. Weekly DIBELS probe, daily behavior chart, bi-weekly math check' },
-  ],
-
-  // ── Sub Plan ──
   sub: [
-    { id: 'doc-teacher',   label: 'Your Name & Subject/Grade', placeholder: 'e.g. Mr. Davis, 7th Grade ELA' },
-    { id: 'doc-date',      label: 'Date(s) Absent', placeholder: 'e.g. March 15, 2026' },
-    { id: 'doc-schedule',  label: 'Class Schedule', placeholder: 'e.g. Period 1: 8:05–8:55, Period 2: 9:00–9:50...', type: 'textarea' },
-    { id: 'doc-activities',label: 'Activities / Lessons for Each Period', placeholder: 'Describe what students should do for each class period', type: 'textarea' },
-    { id: 'doc-notes',     label: 'Important Notes for Sub', placeholder: 'Seating chart location, student alerts, bathroom policy, emergencies...' },
+    { id: 'doc-date',     label: 'Date(s) Out',         placeholder: 'e.g. March 15, 2026' },
+    { id: 'doc-notes',    label: 'Walk the sub through your day — periods, activities, anything they need to know', placeholder: 'Period 1 (8:05-8:55): Math review worksheet on fractions...\nEmergency sub folder is in top drawer. Nurse is Ms. Green.', type: 'textarea' },
   ],
-
-  // ── Student Behavior Contract ──
   contract: [
-    { id: 'doc-student',   label: 'Student Name (first name or initials)', placeholder: 'e.g. T.W.' },
-    { id: 'doc-grade',     label: 'Grade Level', placeholder: 'e.g. 6th Grade' },
-    { id: 'doc-behaviors', label: 'Target Behaviors to Address', placeholder: 'What specific behaviors need to change?', type: 'textarea' },
-    { id: 'doc-goals',     label: 'Student Goals / Commitments', placeholder: 'What the student agrees to do differently', type: 'textarea' },
-    { id: 'doc-supports',  label: 'Adult Supports & Rewards', placeholder: 'What adults will do to help, and what the student earns for meeting goals' },
-    { id: 'doc-duration',  label: 'Contract Duration / Review Date', placeholder: 'e.g. 2 weeks, review on March 29' },
+    { id: 'doc-student',  label: 'Student (initials only)', placeholder: 'e.g. T.W.' },
+    { id: 'doc-grade',    label: 'Grade',               placeholder: 'e.g. 6th Grade' },
+    { id: 'doc-behaviors',label: 'What behaviors need to change?', placeholder: 'Be specific — what does it look like when it is happening?', type: 'textarea' },
+    { id: 'doc-supports', label: 'What will adults do to help, and what does the student earn?', placeholder: 'e.g. Daily check-in, Friday free choice if 4/5 days on-target' },
   ],
-
-  // ── Conference Summary Notes ──
   conference: [
-    { id: 'doc-teacher',    label: 'Teacher Name & Role', placeholder: 'e.g. Ms. Williams, 4th Grade' },
-    { id: 'doc-student',    label: 'Student (first name or initials)', placeholder: 'e.g. J.P.' },
-    { id: 'doc-date',       label: 'Conference Date & Time', placeholder: 'e.g. March 12, 2026 · 5:00 PM' },
-    { id: 'doc-attendees',  label: 'Who Attended', placeholder: 'e.g. Teacher, parent/guardian, counselor, student' },
-    { id: 'doc-topics',     label: 'Topics Discussed', placeholder: 'Academic progress, behavior, supports, concerns raised by parent...', type: 'textarea' },
-    { id: 'doc-nextsteps',  label: 'Action Items / Next Steps', placeholder: 'What was agreed upon? Who is responsible for what?' },
+    { id: 'doc-student',  label: 'Student (initials only)', placeholder: 'e.g. J.P.' },
+    { id: 'doc-attendees',label: 'Who attended',        placeholder: 'e.g. Teacher, parent/guardian, counselor' },
+    { id: 'doc-notes',    label: 'What happened in this meeting?', placeholder: 'Topics discussed, what the parent said, concerns raised, what was agreed on...', type: 'textarea' },
   ],
-
-  // ── Disciplinary Notice Letter (NC G.S. 115C-390 compliant) ──
   discipline: [
-    { id: 'doc-student',    label: 'Student Name (first name or initials)', placeholder: 'e.g. A.R.' },
-    { id: 'doc-grade',      label: 'Grade Level', placeholder: 'e.g. 8th Grade' },
-    { id: 'doc-date',       label: 'Date of Incident', placeholder: 'e.g. March 12, 2026' },
-    { id: 'doc-violation',  label: 'Policy / Code Violation', placeholder: 'e.g. Fighting (Code 4.1), Possession of prohibited item (Code 5.2)' },
-    { id: 'doc-description',label: 'Description of Incident', placeholder: 'Factual, objective description of what occurred', type: 'textarea' },
-    { id: 'doc-action',     label: 'Disciplinary Action', placeholder: 'e.g. 1-day in-school suspension, parent conference required, loss of privileges' },
-    { id: 'doc-contact',    label: 'Administrator / Contact Name', placeholder: 'Name and title of issuing administrator' },
+    { id: 'doc-student',  label: 'Student (initials only)', placeholder: 'e.g. A.R.' },
+    { id: 'doc-grade',    label: 'Grade',               placeholder: 'e.g. 8th Grade' },
+    { id: 'doc-violation',label: 'Violation Type',      type: 'select', placeholder: 'Select violation', options: [
+        'Disruptive behavior', 'Insubordination / refusal', 'Fighting / physical altercation',
+        'Bullying / harassment', 'Possession of prohibited item', 'Vandalism / property damage',
+        'Profanity / inappropriate language', 'Theft', 'Truancy / skipping class', 'Other'
+      ]
+    },
+    { id: 'doc-description', label: 'What happened?',  placeholder: 'Factual, objective description of the incident', type: 'textarea' },
+    { id: 'doc-action',   label: 'Disciplinary action taken', placeholder: 'e.g. 1-day ISS, parent conference required, loss of privilege' },
   ],
 };
 
 const TS_DOC_PROMPTS = {
-  lesson: (f) => `Create a complete, professional lesson plan as a structured document. Format using markdown with clear sections.
+  lesson: (f) => `Create a complete, ready-to-use lesson plan as a structured document.
 
-Subject: ${f.subject}
 Grade Level: ${f.grade}
-Topic / Objective: ${f.topic}
-Class Duration: ${f.duration}
-${f.notes ? 'Additional Context: ' + f.notes : ''}
+Subject: ${f.subject}
+Topic / Standard: ${f.topic}
+${f.notes ? 'Class Notes: ' + f.notes : ''}
 
 Include these sections with ## headers:
 ## Lesson Overview
-## Learning Objectives (bullet list, 3-4 objectives)
-## Standards Alignment
+## NC Standard (cite the specific standard code and full text)
+## Learning Target (I can... statement, student-facing)
 ## Materials Needed
-## Lesson Outline (phase | time | activity — formatted as a clear table using | pipes |)
-## Differentiation (Support, On Grade Level, Extension)
-## Assessment & Reflection Notes
+## Lesson Outline (table: Phase | Time | What Teacher Does | What Students Do)
+## Differentiation (Below Grade Level | On Grade Level | Extension | ELL)
+## Assessment & Exit Ticket
 
-Be specific, practical, and directly usable in a classroom. Use educator language.`,
+Be specific and practical. No placeholders — write it ready to use tomorrow.`,
 
-  behavior: (f) => `Create a professional student behavior incident report as a structured document.
+  behavior: (f) => `Create a professional student behavior incident report for a school record.
 
 Student: ${f.student}
 Grade: ${f.grade}
-Date: ${f.date}
 Incident: ${f.incident}
 Action Taken: ${f.action}
+Date: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}
 
 Include these sections with ## headers:
-## Incident Summary
-## Student Information
-## Description of Behavior
-## Antecedents / Context
+## Incident Information (date, student, grade, location)
+## Description of Behavior (objective, factual — what was seen and heard)
+## Antecedents & Context (what was happening immediately before)
 ## Interventions & Actions Taken
 ## Parent / Guardian Communication
 ## Follow-Up Plan
-## Teacher Signature Block (blank lines for signature and date)
+## Signature Block (blank lines: Teacher, Date, Administrator if applicable)
 
-Use objective, professional language appropriate for a school record.`,
+Use objective, professional language. No emotional language. Describe behavior in observable terms.`,
 
-  iep: (f) => `Create a professional IEP progress note / intervention record as a structured document.
+  iep: (f) => `Create a professional IEP progress note for a student's special education record.
 
 Student: ${f.student}
 Grade: ${f.grade}
 Area of Focus: ${f.area}
-Goal: ${f.goal}
-Observations: ${f.notes}
+Notes from Educator: ${f.notes}
 
 Include these sections with ## headers:
 ## Student Information
-## Area of Focus & Current Goal
-## Progress Summary
+## Goal Area & Current Benchmark
+## Progress Summary (data-based — describe growth or lack thereof in measurable terms)
 ## Observations & Evidence
-## Strategies & Interventions in Use
-## Next Steps
-## Service Provider Notes (blank lines)
+## Strategies & Supports Currently in Place
+## What Is and Isn't Working
+## Recommended Next Steps
+## Service Provider Signature Block (blank lines)
 
-Use clinical, objective language appropriate for special education documentation.`,
+Use clinical, objective language appropriate for a special education record.`,
 
-  meeting: (f) => `Create a professional meeting agenda as a structured document.
-
-Meeting Title: ${f.title}
-Date & Time: ${f.date}
-Attendees: ${f.attendees}
-Topics: ${f.topics}
-
-Include these sections with ## headers:
-## Meeting Details
-## Attendees
-## Agenda Items (numbered list with time estimates for each)
-## Discussion Notes (blank lines under each agenda item)
-## Action Items (table: Task | Owner | Due Date)
-## Next Meeting
-
-Keep it clean and functional — something attendees can print and follow along.`,
-
-  parent: (f) => `Create a professional parent communication letter as a structured document.
-
-Teacher: ${f.teacher}
-Student: ${f.student}
-Purpose: ${f.purpose}
-Key Points: ${f.details}
-Tone: ${f.tone}
-
-Format as a formal letter with:
-- Date line
-- Salutation (Dear Parent/Guardian of [student],)
-- Opening paragraph
-- Body paragraphs covering the key points
-- Clear call to action or next steps
-- Closing (Warm regards / Sincerely)
-- Teacher name, role, and contact line
-
-Write it ready to print and send home. Match the requested tone throughout.`,
-
-  rti: (f) => `Create a professional RTI/MTSS Intervention Progress Note following North Carolina's Multi-Tiered System of Support (NC MTSS) framework and the four-step problem-solving model.
+  rti: (f) => `Create a professional RTI/MTSS Intervention Progress Note following the NC MTSS four-step problem-solving model.
 
 Student: ${f.student}
 Grade: ${f.grade}
 Intervention Tier: ${f.tier}
 Area of Concern: ${f.area}
-Baseline Data: ${f.baseline}
-Goal / Target: ${f.goal}
-Intervention / Strategy: ${f.intervention}
-Progress Monitoring Method: ${f.progress}
+Educator Notes: ${f.notes}
 Date: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}
+
+Use the educator's notes to fill in all four NC MTSS steps with specific, data-informed language. Infer reasonable baselines and goals if exact numbers aren't provided — flag them clearly for the educator to verify.
 
 Include these sections with ## headers:
 ## Student Information
-## Intervention Tier & Area of Concern
-## Step 1: Problem Identification (current performance vs. expected, baseline data)
-## Step 2: Problem Analysis (likely barriers to meeting the goal)
+## Step 1: Problem Identification (current performance vs. expected; baseline data)
+## Step 2: Problem Analysis (barriers, root cause hypothesis)
 ## Step 3: Intervention Plan (evidence-based strategy, frequency, duration, who delivers it)
-## Step 4: Progress Monitoring (how and how often data is collected, decision rules)
+## Step 4: Progress Monitoring (method, frequency, decision rules)
 ## Current Progress Summary
-## Parent Communication (date parents were informed and how)
+## Parent Communication Log (date and method — leave blank if unknown)
 ## Team Signatures (blank lines: Teacher, Interventionist, Administrator, Date)
 
-Use NC MTSS documentation language. Be specific and data-driven. Note that NC requires identifying students at risk beginning in kindergarten and that parents/guardians must be included in implementation and review.`,
+Use NC MTSS documentation language. Note any fields the educator should verify before filing.`,
 
-  sub: (f) => `Create a detailed substitute teacher plan that is clear enough for someone unfamiliar with the classroom to execute smoothly.
+  meeting: (f) => `Create a clean, functional meeting agenda that attendees can print and follow.
 
-Teacher: ${f.teacher}
-Date(s): ${f.date}
-Class Schedule: ${f.schedule}
-Activities / Lessons: ${f.activities}
-Important Notes: ${f.notes}
+Meeting: ${f.title}
+Goal of this meeting: ${f.goal}
+Attendees: ${f.attendees}
+Topics: ${f.topics}
+Date: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}
 
 Include these sections with ## headers:
-## Teacher Information & Date(s)
-## Welcome & Overview (brief welcome note to the sub, tone of class expectations)
-## Class Schedule (table: Period | Time | Class | Room)
-## Lesson Plans by Period (detailed instructions for each period — what to do, how long, what to hand out)
-## Classroom Procedures (attendance, bathroom, early finishers, transitions)
-## Important Student Notes (any alerts the sub needs to know — keep confidential, first name or initials only)
-## Emergency & Logistics (emergency procedures, where things are located, who to call)
-## End of Day (what to leave on the desk, how to dismiss)
+## Meeting Information (type, date, time, location, attendees)
+## Meeting Goal
+## Agenda (numbered list — each item with a time estimate and the name of who's leading it)
+## Discussion Notes (blank writing space under each agenda item)
+## Decisions Made
+## Action Items (table: Task | Owner | Due Date)
+## Next Meeting
 
-Write clear, step-by-step instructions. Assume the sub has never been in this classroom before.`,
+Keep it tight and functional.`,
 
-  contract: (f) => `Create a professional student behavior contract that is collaborative, respectful, and appropriate for a school setting.
+  parent: (f) => `Create a professional parent communication letter, ready to print and send home.
+
+Student: ${f.student}
+Purpose: ${f.purpose}
+Key Points: ${f.details}
+Tone: ${f.tone}
+Date: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}
+
+Format as a formal letter:
+- Date
+- Salutation: Dear Parent/Guardian of [student],
+- Opening paragraph (state the purpose clearly)
+- Body paragraphs (cover each key point)
+- Clear call to action or next step
+- Closing (match the tone — Warm regards / Sincerely / With concern)
+- Signature block: [Teacher Name] / [Role] / [School] / [Contact]
+
+Match the selected tone throughout. Write in plain language — assume English may not be the family's first language.`,
+
+  sub: (f) => `Create a detailed substitute teacher plan clear enough for someone who has never been in this classroom.
+
+Date(s): ${f.date}
+Educator's Notes: ${f.notes}
+
+Use the notes to build a complete plan. Infer a reasonable schedule and fill in professional language around what the educator provided.
+
+Include these sections with ## headers:
+## Welcome Note to the Substitute
+## Schedule Overview (table: Period/Time | Class | Room | # of Students)
+## Instructions by Period (step-by-step for each class — what to do, how long, what to say)
+## Classroom Procedures (attendance, bathroom, transitions, early finishers, dismissal)
+## Student Alerts (initials only — medical, behavioral, or academic needs the sub must know)
+## Where Things Are (supplies, emergency folder, seating chart, etc.)
+## Emergency Procedures
+## End of Day Instructions (what to leave on desk, how to dismiss, who to see)
+
+Write it so a brand-new sub can run the day confidently.`,
+
+  contract: (f) => `Create a student behavior contract that feels like a partnership, not a punishment.
 
 Student: ${f.student}
 Grade: ${f.grade}
-Target Behaviors: ${f.behaviors}
-Student Goals: ${f.goals}
+Behaviors to Address: ${f.behaviors}
 Adult Supports & Rewards: ${f.supports}
-Contract Duration: ${f.duration}
+Date: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}
 
 Include these sections with ## headers:
-## What This Contract Is About (student-friendly explanation of purpose)
-## Behaviors We Are Working On (specific, observable behavior statements)
-## Student Commitments (what the student agrees to do — written in first person, e.g. "I will...")
-## How Adults Will Help (specific supports, check-ins, accommodations)
-## Rewards & Positive Reinforcement (specific, achievable rewards tied to goals)
-## How We Will Know It's Working (how progress is measured and reviewed)
+## What This Contract Is About (1-2 sentences, student-friendly)
+## The Behaviors We Are Working On (specific, observable statements)
+## Student Commitments ("I will..." statements written from the student's perspective)
+## How Adults Will Help (specific check-ins, supports, accommodations)
+## Rewards & Recognition (clear, achievable, tied to the goals)
+## How We Will Know It's Working (simple tracking method)
 ## Review Date
-## Signatures (blank lines: Student, Teacher, Parent/Guardian, Administrator, Date)
+## Signatures (blank lines: Student, Teacher, Parent/Guardian, Date)
 
-Write it in language a student can understand. The contract should feel like a partnership, not a punishment.`,
+Use language a student can read and understand. Collaborative, respectful, specific.`,
 
-  conference: (f) => `Create a professional parent-teacher conference summary note for the school record.
+  conference: (f) => `Create a professional parent-teacher conference summary for the student's record.
 
-Teacher: ${f.teacher}
 Student: ${f.student}
-Date & Time: ${f.date}
 Attendees: ${f.attendees}
-Topics Discussed: ${f.topics}
-Action Items / Next Steps: ${f.nextsteps}
+Notes from Educator: ${f.notes}
+Date: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}
+
+Use the notes to build a complete summary. Organize and elevate whatever the educator provided into professional documentation.
 
 Include these sections with ## headers:
 ## Conference Information (date, time, attendees, student)
-## Academic Progress Summary
+## Academic Status Summary
 ## Social-Emotional & Behavioral Notes
-## Topics & Concerns Discussed
+## Topics & Concerns Discussed (include concerns raised by the parent)
 ## Strengths Identified
-## Areas for Growth / Support Needed
-## Action Items (table: Action | Responsible Party | Timeline)
+## Areas for Growth / Supports Needed
+## Action Items (table: Action | Who Is Responsible | Timeline)
 ## Follow-Up Plan
 ## Signatures (blank lines: Teacher, Parent/Guardian, Date)
 
-Use professional, objective language. This document is part of the student's record. Note any concerns raised by the parent and how they were addressed.`,
+Professional, objective, complete. Flag any follow-up actions clearly.`,
 
-  discipline: (f) => `Create a professional student disciplinary notice letter compliant with North Carolina G.S. 115C-390 and the NC Code of Student Conduct.
+  discipline: (f) => `Create a formal student disciplinary notice compliant with NC G.S. 115C-390 and CMS Student Code of Conduct.
 
 Student: ${f.student}
 Grade: ${f.grade}
-Date of Incident: ${f.date}
-Policy / Code Violation: ${f.violation}
+Violation Type: ${f.violation}
 Description: ${f.description}
-Disciplinary Action: ${f.action}
-Issuing Administrator: ${f.contact}
+Action Taken: ${f.action}
+Date: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}
 
 Include these sections with ## headers:
 ## Notice of Disciplinary Action
 ## Student & Incident Information
-## Description of Violation (factual, objective, specific policy code cited)
+## Description of Violation (factual, objective — no emotional language)
 ## Disciplinary Action Imposed
-## Parent/Guardian Rights (include NC G.S. 115C-390 language: right to review records, right to appeal, right to request a conference within 3 days)
-## Appeal Process (state that parent may request review of the decision in writing within 3 business days)
-## Required Next Steps (any conditions student must meet to return / remain in good standing)
-## Contact Information (who to reach for questions — name, role, phone/email)
-## Signature Block (blank lines: Administrator, Title, Date; Parent Acknowledgment signature line)
+## Parent/Guardian Rights (NC G.S. 115C-390: right to review records, right to request conference within 3 days, right to appeal)
+## Appeal Process (written appeal must be submitted within 3 business days)
+## Required Next Steps (any conditions for return / restoration of privileges)
+## Contact Information (name, title, phone/email — leave blank for educator to fill)
+## Signature Block (blank lines: Administrator, Title, Date; Parent Acknowledgment line)
 
-Use formal, legally appropriate language. Cite the specific policy code violated. Include all required NC parent rights notifications. Keep descriptions factual and free of emotional language.`,
+Formal, legally appropriate language. Factual descriptions only. All required NC parent rights notifications included.`,
 };
 
 const TS_DOC_LABELS = {
@@ -3638,11 +3611,19 @@ function tsRenderDocFields(type) {
     }
     return `<div class="ts-doc-field"><label>${f.label}</label><input type="text" id="${f.id}" placeholder="${f.placeholder}" /></div>`;
   }).join('');
-  // Auto-populate today's date in any doc-date field
+
+  // Auto-populate from profile
+  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   const dateEl = document.getElementById('doc-date');
-  if (dateEl && !dateEl.value) {
-    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    dateEl.placeholder = today;
+  if (dateEl && !dateEl.value) dateEl.placeholder = today;
+
+  if (tsProfile) {
+    const gradeEl = document.getElementById('doc-grade');
+    if (gradeEl && !gradeEl.value && tsProfile.grade_level) gradeEl.value = tsProfile.grade_level;
+    const teacherEl = document.getElementById('doc-teacher');
+    if (teacherEl && !teacherEl.value && tsProfile.full_name) teacherEl.value = tsProfile.full_name;
+    const schoolEl = document.getElementById('doc-school');
+    if (schoolEl && !schoolEl.value && tsProfile.school_name) schoolEl.value = tsProfile.school_name;
   }
 }
 
@@ -3743,59 +3724,68 @@ async function tsDocBuildAndDownload(markdown, docType, values) {
 
   const {
     Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-    Header, Footer, AlignmentType, BorderStyle, WidthType, ShadingType,
-    VerticalAlign, LevelFormat, PageNumber, NumberFormat
+    Header, AlignmentType, BorderStyle, WidthType, ShadingType,
+    LevelFormat, UnderlineType
   } = docx;
 
-  const GOLD = 'C9A84C', GOLD_LIGHT = 'F5ECD0', DARK = '1A1A1A';
-  const GRAY_BG = 'F7F7F5', WHITE = 'FFFFFF';
+  const BLACK = '000000';
 
-  const cellBorder = { style: BorderStyle.SINGLE, size: 1, color: 'D4C89A' };
-  const allBorders = { top: cellBorder, bottom: cellBorder, left: cellBorder, right: cellBorder };
+  const label = TS_DOC_LABELS[docType] || 'Document';
+  const titleText = values.topic || values.title || values.purpose || values.area || label;
+  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  // ── Header ──
+  // ── Header: CMS institutional style ──
   const header = new Header({ children: [
     new Paragraph({
       children: [
-        new TextRun({ text: 'ProphetApp AI  ·  Teachers Space     Carolina LifeStock Association', font: 'Arial', size: 18, color: GOLD, bold: true }),
+        new TextRun({ text: 'Charlotte-Mecklenburg Schools', font: 'Arial', size: 20, bold: true, color: BLACK }),
       ],
-      border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: GOLD, space: 1 } },
-      spacing: { before: 0, after: 160 }
-    })
-  ]});
-
-  // ── Footer ──
-  const footer = new Footer({ children: [
-    new Paragraph({
-      children: [
-        new TextRun({ text: 'Generated by ProphetApp AI  ·  carolinalsa.com  ·  Page ', font: 'Arial', size: 16, color: 'AAAAAA' }),
-        new TextRun({ children: [PageNumber.CURRENT], font: 'Arial', size: 16, color: 'AAAAAA' }),
-      ],
-      border: { top: { style: BorderStyle.SINGLE, size: 2, color: GOLD_LIGHT, space: 1 } },
-      spacing: { before: 120, after: 0 }
+      border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: BLACK, space: 4 } },
+      spacing: { before: 0, after: 100 }
     })
   ]});
 
   const children = [];
 
-  // ── Title block ──
-  const label = TS_DOC_LABELS[docType] || 'Document';
-  const titleText = values.topic || values.title || values.purpose || values.area || label;
+  // ── Document type label ──
   children.push(new Paragraph({
-    children: [new TextRun({ text: label.toUpperCase(), font: 'Arial', size: 18, bold: true, color: GOLD })],
-    spacing: { before: 200, after: 80 }
-  }));
-  children.push(new Paragraph({
-    children: [new TextRun({ text: titleText, font: 'Arial', size: 42, bold: true, color: DARK })],
-    spacing: { before: 0, after: 80 }
-  }));
-  children.push(new Paragraph({
-    children: [new TextRun({ text: '' })],
-    border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: GOLD, space: 1 } },
-    spacing: { before: 80, after: 200 }
+    children: [new TextRun({ text: label.toUpperCase(), font: 'Arial', size: 22, bold: true, color: BLACK })],
+    alignment: AlignmentType.CENTER,
+    spacing: { before: 240, after: 60 }
   }));
 
-  // ── Parse markdown into docx elements ──
+  // ── Rule under title ──
+  children.push(new Paragraph({
+    children: [new TextRun({ text: '' })],
+    border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: BLACK, space: 1 } },
+    spacing: { before: 0, after: 0 }
+  }));
+
+  // ── Info block: School / Teacher / Grade / Date ──
+  const school = values.school || '';
+  const teacher = values.teacher || values.name || '';
+  const grade = values.grade || values.gradeLevel || '';
+  const infoLines = [];
+  if (school) infoLines.push('School: ' + school);
+  if (teacher) infoLines.push('Prepared by: ' + teacher);
+  if (grade) infoLines.push('Grade/Subject: ' + grade);
+  infoLines.push('Date: ' + today);
+
+  children.push(new Paragraph({
+    children: infoLines.map((line, idx) => new TextRun({
+      text: line + (idx < infoLines.length - 1 ? '     ' : ''),
+      font: 'Arial', size: 20, color: BLACK
+    })),
+    spacing: { before: 140, after: 140 }
+  }));
+
+  children.push(new Paragraph({
+    children: [new TextRun({ text: '' })],
+    border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: BLACK, space: 1 } },
+    spacing: { before: 0, after: 200 }
+  }));
+
+  // ── Parse markdown ──
   const lines = markdown.split('\n');
   let i = 0;
   while (i < lines.length) {
@@ -3803,41 +3793,38 @@ async function tsDocBuildAndDownload(markdown, docType, values) {
     const trimmed = line.trim();
 
     if (!trimmed) {
-      children.push(new Paragraph({ children: [new TextRun({ text: '' })], spacing: { before: 60, after: 0 } }));
+      children.push(new Paragraph({ children: [new TextRun({ text: '' })], spacing: { before: 80, after: 0 } }));
       i++; continue;
     }
 
-    // H2 section header
     if (trimmed.startsWith('## ')) {
       const text = trimmed.replace(/^##\s+/, '');
       children.push(new Paragraph({
-        children: [new TextRun({ text: text.toUpperCase(), font: 'Arial', size: 18, bold: true, color: GOLD })],
+        children: [new TextRun({ text: text.toUpperCase(), font: 'Arial', size: 22, bold: true, color: BLACK,
+          underline: { type: UnderlineType.SINGLE, color: BLACK } })],
         spacing: { before: 280, after: 80 }
       }));
       i++; continue;
     }
 
-    // H1
     if (trimmed.startsWith('# ') && !trimmed.startsWith('## ')) {
       const text = trimmed.replace(/^#\s+/, '');
       children.push(new Paragraph({
-        children: [new TextRun({ text, font: 'Arial', size: 32, bold: true, color: DARK })],
-        spacing: { before: 200, after: 120 }
+        children: [new TextRun({ text, font: 'Arial', size: 26, bold: true, color: BLACK })],
+        spacing: { before: 200, after: 100 }
       }));
       i++; continue;
     }
 
-    // H3
     if (trimmed.startsWith('### ')) {
       const text = trimmed.replace(/^###\s+/, '');
       children.push(new Paragraph({
-        children: [new TextRun({ text, font: 'Arial', size: 24, bold: true, color: DARK })],
-        spacing: { before: 160, after: 80 }
+        children: [new TextRun({ text, font: 'Arial', size: 22, bold: true, color: BLACK })],
+        spacing: { before: 160, after: 60 }
       }));
       i++; continue;
     }
 
-    // Table: collect all pipe rows
     if (trimmed.startsWith('|')) {
       const tableLines = [];
       while (i < lines.length && lines[i].trim().startsWith('|')) {
@@ -3850,19 +3837,19 @@ async function tsDocBuildAndDownload(markdown, docType, values) {
         const colCount = Math.max(...parsed.map(r => r.length));
         const colWidth = Math.floor(9360 / colCount);
         const colWidths = Array(colCount).fill(colWidth);
-
+        const cb = { style: BorderStyle.SINGLE, size: 1, color: BLACK };
+        const borders = { top: cb, bottom: cb, left: cb, right: cb };
         const tableRows = parsed.map((cells, ri) => {
           const isHeader = ri === 0;
-          // Pad cells to colCount
           while (cells.length < colCount) cells.push('');
           return new TableRow({
             children: cells.map((cellText, ci) => new TableCell({
-              borders: allBorders,
+              borders,
               width: { size: colWidths[ci], type: WidthType.DXA },
-              shading: { fill: isHeader ? GOLD : (ri % 2 === 0 ? WHITE : GRAY_BG), type: ShadingType.CLEAR },
-              margins: { top: 80, bottom: 80, left: 120, right: 120 },
+              shading: { fill: isHeader ? 'D9D9D9' : 'FFFFFF', type: ShadingType.CLEAR },
+              margins: { top: 60, bottom: 60, left: 100, right: 100 },
               children: [new Paragraph({
-                children: [new TextRun({ text: cellText, font: 'Arial', size: 20, bold: isHeader, color: isHeader ? WHITE : DARK })],
+                children: [new TextRun({ text: cellText, font: 'Arial', size: 20, bold: isHeader, color: BLACK })],
                 spacing: { before: 0, after: 0 }
               })]
             }))
@@ -3874,61 +3861,43 @@ async function tsDocBuildAndDownload(markdown, docType, values) {
       continue;
     }
 
-    // Bullet
     if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
       const text = trimmed.replace(/^[-*]\s+/, '');
-      const runs = tsDocParseInline(text, DARK);
       children.push(new Paragraph({
         numbering: { reference: 'doc-bullets', level: 0 },
-        children: runs,
-        spacing: { before: 40, after: 60 }
+        children: tsDocParseInline(text, BLACK),
+        spacing: { before: 40, after: 40 }
       }));
       i++; continue;
     }
 
-    // Numbered list
     if (/^\d+\.\s/.test(trimmed)) {
       const text = trimmed.replace(/^\d+\.\s+/, '');
-      const runs = tsDocParseInline(text, DARK);
       children.push(new Paragraph({
         numbering: { reference: 'doc-numbers', level: 0 },
-        children: runs,
-        spacing: { before: 40, after: 60 }
+        children: tsDocParseInline(text, BLACK),
+        spacing: { before: 40, after: 40 }
       }));
       i++; continue;
     }
 
-    // Regular paragraph
-    const runs = tsDocParseInline(trimmed, DARK);
-    children.push(new Paragraph({ children: runs, spacing: { before: 40, after: 80 } }));
+    children.push(new Paragraph({ children: tsDocParseInline(trimmed, BLACK), spacing: { before: 40, after: 80 } }));
     i++;
   }
 
   const doc = new Document({
     numbering: {
       config: [
-        {
-          reference: 'doc-bullets',
-          levels: [{ level: 0, format: LevelFormat.BULLET, text: '\u2022', alignment: AlignmentType.LEFT,
-            style: { paragraph: { indent: { left: 480, hanging: 240 } } } }]
-        },
-        {
-          reference: 'doc-numbers',
-          levels: [{ level: 0, format: LevelFormat.DECIMAL, text: '%1.', alignment: AlignmentType.LEFT,
-            style: { paragraph: { indent: { left: 480, hanging: 240 } } } }]
-        },
+        { reference: 'doc-bullets', levels: [{ level: 0, format: LevelFormat.BULLET, text: '\u2022',
+            alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 480, hanging: 240 } } } }] },
+        { reference: 'doc-numbers', levels: [{ level: 0, format: LevelFormat.DECIMAL, text: '%1.',
+            alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 480, hanging: 240 } } } }] },
       ]
     },
-    styles: { default: { document: { run: { font: 'Arial', size: 22 } } } },
+    styles: { default: { document: { run: { font: 'Arial', size: 22, color: BLACK } } } },
     sections: [{
-      properties: {
-        page: {
-          size: { width: 12240, height: 15840 },
-          margin: { top: 1080, right: 1080, bottom: 1080, left: 1080 }
-        }
-      },
+      properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1080, right: 1080, bottom: 1080, left: 1080 } } },
       headers: { default: header },
-      footers: { default: footer },
       children
     }]
   });
